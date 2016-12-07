@@ -17,6 +17,16 @@ abstract class Optimization {
 
         return $path['dirname'].'/'.$path['filename'].'.'.filemtime($src).'.'.$path['extension'];
     }
+
+    public static function listIncludes():void {
+	    $includes = get_included_files();
+
+		echo '<details><summary>', count($includes), ' include(s)', '</summary>', PHP_EOL;
+		echo '<ul>';
+		foreach ($includes as $filename)
+			echo '<li>', $filename, '</li>', PHP_EOL;
+		echo '</ul></details>', PHP_EOL;
+    }
 }
 
 class Timed {
