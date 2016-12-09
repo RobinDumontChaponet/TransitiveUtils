@@ -51,10 +51,12 @@ class Timed {
         $ru = getrusage();
         $time = microtime(true) - $_SERVER['REQUEST_TIME_FLOAT'];
 
-        echo '<b>Memory :</b> '.humanWeight(memory_get_peak_usage()).'<br />';
-        echo '<b>Process Time :</b> '.($time * 1000).' ms<br />';
+		echo '<dl>';
+        echo '<dt>Memory</dt><dd>'.humanWeight(memory_get_usage()).'; Peak: '.humanWeight(memory_get_peak_usage()).'</dd>';
+        echo '<dt>Process Time</dt><dd> '.($time * 1000).' ms';
 
-        echo 'This process used '.self::_getrtime($ru, $this->start, 'utime').' ms for its computations<br />';
-        echo 'It spent '.self::_getrtime($ru, $this->start, 'stime').' ms in system calls';
+        echo '<dt>utime (compute)</dt><dd>'.self::_getrtime($ru, $this->start, 'utime').' ms</dd>';
+        echo '<dt>stime (syscall)</dt><dd>'.self::_getrtime($ru, $this->start, 'stime').' ms</dd>';
+        echo '</dl>';
     }
 }
