@@ -2,6 +2,12 @@
 
 namespace Transitive\Utils;
 
+function humanWeight($bytes, $decimals = 2) {
+	$sz = 'BKMGTP';
+	$factor = floor((strlen($bytes) - 1) / 3);
+	return sprintf("%.{$decimals}f", $bytes / pow(1024, $factor)) . @$sz[$factor];
+}
+
 abstract class Optimization {
     public static function minify($src) {
         // Nothing there (but us chickens) anymore... for now.
@@ -45,7 +51,7 @@ class Timed {
         $ru = getrusage();
         $time = microtime(true) - $_SERVER['REQUEST_TIME_FLOAT'];
 
-        echo '<b>Memory :</b> '.memory_get_peak_usage().'<br />';
+        echo '<b>Memory :</b> '.humanWeight(memory_get_peak_usage()).'<br />';
         echo '<b>Process Time :</b> '.($time * 1000).' ms<br />';
 
         echo 'This process used '.self::_getrtime($ru, $this->start, 'utime').' ms for its computations<br />';
