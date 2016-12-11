@@ -5,7 +5,8 @@
 
 namespace Transitive\Utils;
 
-class JsonHandler {
+class JsonHandler
+{
     protected static $_messages = array(
         JSON_ERROR_NONE => 'No error has occurred',
         JSON_ERROR_DEPTH => 'The maximum stack depth has been exceeded',

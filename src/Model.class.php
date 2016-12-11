@@ -2,7 +2,8 @@
 
 namespace Transitive\Utils;
 
-abstract class Model {
+abstract class Model
+{
     protected $id;
 
     public function __construct($id = -1) {
@@ -22,13 +23,14 @@ abstract class Model {
     }
 
     public function __debugInfo() {
-	    return 'TODO';
+        return 'TODO';
     }
 
     public function toJson() {
-	    return 'TODO';
+        return 'TODO';
     }
-	public function toXml() {
-	    return 'TODO';
+
+    public function toXml() {
+        return 'TODO';
     }
 }

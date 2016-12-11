@@ -2,7 +2,8 @@
 
 namespace Transitive\Utils;
 
-abstract class Sessions {
+abstract class Sessions
+{
     public static $keyPrefix;
 
     public static function isStarted() {
@@ -36,6 +37,7 @@ abstract class Sessions {
     public static function exist($key) { // can't name this 'isset' as it's reserved by php.
         return self::isStarted() && isset($_SESSION[self::$keyPrefix.$key]);
     }
+
     public static function get($key) {
         if(self::exist($key))
             return $_SESSION[self::$keyPrefix.$key];

@@ -2,7 +2,8 @@
 
 namespace Transitive\Utils;
 
-abstract class Validation {
+abstract class Validation
+{
     private static $formValidation;
     private static $formValidity;
 

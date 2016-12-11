@@ -2,7 +2,8 @@
 
 namespace Transitive\Utils;
 
-abstract class Mails {
+abstract class Mails
+{
     public static function send($from, $name, $subject, $othersubject, $msg) {
         $error = array();
 

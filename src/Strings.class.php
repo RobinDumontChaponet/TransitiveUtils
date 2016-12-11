@@ -2,7 +2,8 @@
 
 namespace Transitive\Utils;
 
-abstract class Strings {
+abstract class Strings
+{
     /**
      * Returns an string clean of UTF8 characters. It will convert them to a similar ASCII character
      * www.unexpectedit.com.

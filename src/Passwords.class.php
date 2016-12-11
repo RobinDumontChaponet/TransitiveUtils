@@ -2,7 +2,8 @@
 
 namespace Transitive\Utils;
 
-abstract class Passwords {
+abstract class Passwords
+{
     /**
      * Random Password.
      *

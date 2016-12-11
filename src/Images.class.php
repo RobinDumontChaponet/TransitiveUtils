@@ -2,7 +2,8 @@
 
 namespace Transitive\Utils;
 
-abstract class Images {
+abstract class Images
+{
     /**
      * scaleImageRessource function, Transit - Robin Dumont-Chaponet_.
      *

@@ -6,22 +6,27 @@ namespace Transitive\Utils;
 
 use Transitive\Utils\Database as DB;
 
-abstract class ModelDAO {
+abstract class ModelDAO
+{
     const TABLE_NAME = '';
     const DATABASE_CONNECTION_ID = 'data';
+
     protected static function getTableName() {
         $cc = get_called_class();
 
         return DB::getDatabaseById(self::DATABASE_CONNECTION_ID)->getTablePrefix().$cc::TABLE_NAME;
     }
+
     protected static function getConnectionId() {
         $cc = get_called_class();
 
         return $cc::DATABASE_CONNECTION_ID;
     }
+
     protected static function getInstance() {
         return DB::getInstanceById(self::DATABASE_CONNECTION_ID);
     }
+
     protected static function prepare($statement) {
         return self::getInstance()->prepare($statement);
     }
@@ -41,7 +46,6 @@ abstract class ModelDAO {
 // 			$statement->bindValue(1, $user->getLogin());
 
             $statement->execute();
-
         } catch (PDOException $e) {
             die(__METHOD__.' : '.$e->getMessage().'<br/>');
         }

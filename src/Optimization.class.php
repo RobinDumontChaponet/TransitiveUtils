@@ -3,13 +3,14 @@
 namespace Transitive\Utils;
 
 function humanWeight($bytes, $decimals = 2) {
-	$sz = 'BKMGTP';
-	$factor = floor((strlen($bytes) - 1) / 3);
+    $sz = 'BKMGTP';
+    $factor = floor((strlen($bytes) - 1) / 3);
 
-	return sprintf("%.{$decimals}f", $bytes / pow(1024, $factor)).@$sz[$factor];
+    return sprintf("%.{$decimals}f", $bytes / pow(1024, $factor)).@$sz[$factor];
 }
 
-abstract class Optimization {
+abstract class Optimization
+{
     public static function minify($src) {
         // Nothing there (but us chickens) anymore... for now.
         // It didn't work well anyway...
@@ -25,18 +26,19 @@ abstract class Optimization {
         return $path['dirname'].'/'.$path['filename'].'.'.filemtime($src).'.'.$path['extension'];
     }
 
-    public static function listIncludes():void {
-	    $includes = get_included_files();
+    public static function listIncludes(): void {
+        $includes = get_included_files();
 
-		echo '<details><summary>', count($includes), ' include(s)', '</summary>', PHP_EOL;
-		echo '<ul>';
-		foreach ($includes as $filename)
-			echo '<li>', $filename, '</li>', PHP_EOL;
-		echo '</ul></details>', PHP_EOL;
+        echo '<details><summary>', count($includes), ' include(s)', '</summary>', PHP_EOL;
+        echo '<ul>';
+        foreach ($includes as $filename)
+            echo '<li>', $filename, '</li>', PHP_EOL;
+        echo '</ul></details>', PHP_EOL;
     }
 }
 
-class Timed {
+class Timed
+{
     private $start;
 
     public function __construct() {
@@ -52,7 +54,7 @@ class Timed {
         $ru = getrusage();
         $time = microtime(true) - $_SERVER['REQUEST_TIME_FLOAT'];
 
-		echo '<dl>';
+        echo '<dl>';
         echo '<dt>Memory</dt><dd>'.humanWeight(memory_get_usage()).'; Peak: '.humanWeight(memory_get_peak_usage()).'</dd>';
         echo '<dt>Process Time</dt><dd> '.($time * 1000).' ms';
 

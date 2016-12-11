@@ -5,7 +5,8 @@ namespace Transitive\Utils;
 use PDO;
 use PDOException;
 
-class Database {
+class Database
+{
     private static $PDOInstances = array();
     private static $databases = array();
 
@@ -29,6 +30,7 @@ class Database {
     public function getTablePrefix() {
         return $this->tablePrefix;
     }
+
     public function setTablePrefix($value) {
         $this->tablePrefix = $value;
     }
@@ -60,7 +62,6 @@ class Database {
     public static function getInstanceById($id) {
         if(!isset(self::$databases[$id]))
             throw Exception('<b>Error '.__METHOD__.' : Database with id "'.$id.'" does not exist in database pool.<br />'.PHP_EOL);
-
         return self::$databases[$id]->getInstance();
     }
 

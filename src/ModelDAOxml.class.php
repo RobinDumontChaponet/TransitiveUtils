@@ -2,7 +2,8 @@
 
 namespace Transitive\Utils;
 
-abstract class ModelDAOxml {
+abstract class ModelDAOxml
+{
     const FILE_NAME = '';
     const TAG_NAME = '';
 
