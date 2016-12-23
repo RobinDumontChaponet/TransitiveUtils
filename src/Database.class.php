@@ -62,7 +62,7 @@ class Database
 
     public static function getInstanceById($id) {
         if(!isset(self::$databases[$id]))
-            throw Exception('<b>Error '.__METHOD__.' : Database with id "'.$id.'" does not exist in database pool.<br />'.PHP_EOL);
+            throw new Exception('<b>Error '.__METHOD__.' : Database with id "'.$id.'" does not exist in database pool.<br />'.PHP_EOL);
         return self::$databases[$id]->getInstance();
     }
 
