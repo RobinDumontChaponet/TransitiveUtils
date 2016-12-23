@@ -14,7 +14,7 @@ abstract class ModelDAO
     protected static function getTableName() {
         $cc = get_called_class();
 
-        return DB::getDatabaseById(self::DATABASE_CONNECTION_ID)->getTablePrefix().$cc::TABLE_NAME;
+        return DB::getInstanceById(self::DATABASE_CONNECTION_ID)->getTablePrefix().$cc::TABLE_NAME;
     }
 
     protected static function getConnectionId() {
