@@ -66,6 +66,10 @@ class Database
         return self::$databases[$id]->getInstance();
     }
 
+    public static function getDatabaseById ($id) {
+		return self::$databases[$id];
+    }
+
     private function __clone() {
         throw new Exception('<b>Error '.__METHOD__.' : You shall not clone this.<br />'.PHP_EOL);
     }
