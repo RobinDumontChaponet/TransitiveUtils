@@ -4,6 +4,8 @@ namespace Transitive\Utils;
 
 // @TODO !
 
+// use Exception;
+use PDOException;
 use Transitive\Utils\Database as DB;
 
 abstract class ModelDAO

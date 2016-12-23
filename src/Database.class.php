@@ -3,6 +3,7 @@
 namespace Transitive\Utils;
 
 use PDO;
+use Exception;
 use PDOException;
 
 class Database
