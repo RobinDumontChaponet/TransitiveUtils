@@ -22,10 +22,6 @@ abstract class Model
         return  get_class().' [ id: '.$this->id.(((!get_parent_class())) ? ' ]' : ';  ');
     }
 
-    public function __debugInfo() {
-        return 'TODO';
-    }
-
     public function toJson() {
         return 'TODO';
     }
