@@ -4,7 +4,7 @@ namespace Transitive\Utils;
 
 abstract class Sessions
 {
-    public static $keyPrefix;
+    public static $keyPrefix = '';
 
     public static function isStarted() {
         return session_status() != PHP_SESSION_NONE;
@@ -46,7 +46,8 @@ abstract class Sessions
     }
 
     public static function delete($key) {
-        unset($_SESSION[self::$keyPrefix.$key]);
+	    if(self::exist($key))
+	        unset($_SESSION[self::$keyPrefix.$key]);
     }
 
     public static function destroy() {
