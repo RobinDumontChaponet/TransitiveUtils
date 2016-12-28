@@ -66,8 +66,8 @@ class Database
         return self::$databases[$id]->getInstance();
     }
 
-    public static function getDatabaseById ($id) {
-		return self::$databases[$id];
+    public static function getDatabaseById($id) {
+        return self::$databases[$id];
     }
 
     private function __clone() {

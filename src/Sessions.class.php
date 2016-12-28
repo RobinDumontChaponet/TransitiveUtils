@@ -46,8 +46,8 @@ abstract class Sessions
     }
 
     public static function delete($key) {
-	    if(self::exist($key))
-	        unset($_SESSION[self::$keyPrefix.$key]);
+        if(self::exist($key))
+            unset($_SESSION[self::$keyPrefix.$key]);
     }
 
     public static function destroy() {
