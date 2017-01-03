@@ -32,7 +32,7 @@ abstract class ModelDAO
         return DB::getInstanceById(self::DATABASE_CONNECTION_ID);
     }
 
-    protected static function prepare(string $statement): PDOStatement
+    protected static function prepare(string $statement): \PDOStatement
     {
         return self::getInstance()->prepare($statement);
     }
