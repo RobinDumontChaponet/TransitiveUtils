@@ -17,7 +17,8 @@ if (!function_exists('http_response_code')) {
 
 abstract class HttpRequest
 {
-    public static function http_response_message() {
+    public static function http_response_message(): ?string
+    {
         $code = http_response_code();
         if(isset(self::$httpCustomStatusMessages[$code]))
             return self::$httpCustomStatusMessages[$code];

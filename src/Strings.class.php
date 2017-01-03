@@ -86,21 +86,24 @@ abstract class Strings
         return $text;
     }
 
-    public static function post_slug($str) {
+    public static function post_slug(string $str): string {
         return strtolower(preg_replace(array('#[\\s-]+#', '#[^A-Za-z0-9\. _]+#'), array('_', ''), self::cleanString(urldecode($str))));
     }
 
-    public static function startsWith($haystack, $needle) {
+    public static function startsWith(string $haystack, string $needle): string
+    {
         // search backwards starting from haystack length characters from the end
         return $needle === '' || strrpos($haystack, $needle, -strlen($haystack)) !== false;
     }
 
-    public static function endsWith($haystack, $needle) {
+    public static function endsWith(string $haystack, string $needle): string
+    {
         // search forward starting from end minus needle length characters
         return $needle === '' || (($temp = strlen($haystack) - strlen($needle)) >= 0 && strpos($haystack, $needle, $temp) !== false);
     }
 
-    public static function contentEditableParse($content) {
+    public static function contentEditableParse(string $content): string
+    {
         $content = str_replace('<br>', '<br />', trim($content));
         $content = str_replace('<div><br />', '<br /><br />', $content);
         $content = str_replace(array('<div>', '</div>'), '', $content);

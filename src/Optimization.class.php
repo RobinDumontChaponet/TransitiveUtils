@@ -16,11 +16,13 @@ abstract class Optimization
         // It didn't work well anyway...
     }
 
-    public static function newTimer() {
+    public static function newTimer(): Timed
+    {
         return new Timed();
     }
 
-    public static function cacheBust($src) {
+    public static function cacheBust(string $src): string
+    {
         $path = pathinfo($src);
 
         return $path['dirname'].'/'.$path['filename'].'.'.filemtime($src).'.'.$path['extension'];
@@ -41,16 +43,19 @@ class Timed
 {
     private $start;
 
-    public function __construct() {
+    public function __construct()
+    {
         $this->start = getrusage();
     }
 
-    private static function _getrtime($ru, $rus, $index) {
+    private static function _getrtime($ru, $rus, $index)
+    {
         return ($ru["ru_$index.tv_sec"] * 1000 + intval($ru["ru_$index.tv_usec"] / 1000))
          - ($rus["ru_$index.tv_sec"] * 1000 + intval($rus["ru_$index.tv_usec"] / 1000));
     }
 
-    public function printResult() {
+    public function printResult(): string
+    {
         $ru = getrusage();
         $time = microtime(true) - $_SERVER['REQUEST_TIME_FLOAT'];
 

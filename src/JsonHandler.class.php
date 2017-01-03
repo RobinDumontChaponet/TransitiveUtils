@@ -16,7 +16,8 @@ class JsonHandler
         JSON_ERROR_UTF8 => 'Malformed UTF-8 characters, possibly incorrectly encoded',
     );
 
-    public static function encode($value, $options = 0) {
+    public static function encode($value, $options = 0): ?string
+    {
         $result = json_encode($value, $options);
 
         if($result)  {

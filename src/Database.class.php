@@ -18,7 +18,8 @@ class Database
     private $dbPwd;
     private $tablePrefix;
 
-    public function __construct($dbName, $dbUser, $dbPwd = '', $dbType = 'mysql', $dbHost = 'localhost', $dbPort = '3306', $tablePrefix = '') {
+    public function __construct(string $dbName, string  $dbUser, string $dbPwd = '', string $dbType = 'mysql', string $dbHost = 'localhost', string $dbPort = '3306', string $tablePrefix = '')
+    {
         $this->dbType = $dbType;
         $this->dbHost = $dbHost;
         $this->dbPort = $dbPort;
@@ -28,19 +29,23 @@ class Database
         $this->tablePrefix = $tablePrefix;
     }
 
-    public function getTablePrefix() {
+    public function getTablePrefix(): string
+    {
         return $this->tablePrefix;
     }
 
-    public function setTablePrefix($value) {
+    public function setTablePrefix(string $value): void
+    {
         $this->tablePrefix = $value;
     }
 
-    public static function addDatabase($id, $database) {
+    public static function addDatabase(string $id, self $database): void
+    {
         self::$databases[$id] = $database;
     }
 
-    public function getInstance() {
+    public function getInstance(): ?PDO
+    {
         if (!isset(self::$PDOInstances[$this->dbType.':'.$this->dbName.','.$this->dbUser])) {
             try {
                 self::$PDOInstances[$this->dbType.':'.$this->dbName.','.$this->dbUser] = new PDO(
@@ -60,21 +65,24 @@ class Database
         return self::$PDOInstances[$this->dbType.':'.$this->dbName.','.$this->dbUser];
     }
 
-    public static function getInstanceById($id) {
+    public static function getInstanceById($id): ?PDO {
         if(!isset(self::$databases[$id]))
             throw new Exception('<b>Error '.__METHOD__.' : Database with id "'.$id.'" does not exist in database pool.<br />'.PHP_EOL);
         return self::$databases[$id]->getInstance();
     }
 
-    public static function getDatabaseById($id) {
+    public static function getDatabaseById($id): ?self
+    {
         return self::$databases[$id];
     }
 
-    private function __clone() {
+    private function __clone()
+    {
         throw new Exception('<b>Error '.__METHOD__.' : You shall not clone this.<br />'.PHP_EOL);
     }
 
-    public function __destruct() {
+    public function __destruct()
+    {
         foreach(self::$PDOInstances as $PDOInstance) {
             $PDOInstance = null;
             unset($PDOInstance);

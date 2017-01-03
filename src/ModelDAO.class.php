@@ -13,23 +13,27 @@ abstract class ModelDAO
     const TABLE_NAME = '';
     const DATABASE_CONNECTION_ID = 'data';
 
-    protected static function getTableName() {
+    protected static function getTableName(): string
+    {
         $cc = get_called_class();
 
         return DB::getDatabaseById(self::DATABASE_CONNECTION_ID)->getTablePrefix().$cc::TABLE_NAME;
     }
 
-    protected static function getConnectionId() {
+    protected static function getConnectionId(): string
+    {
         $cc = get_called_class();
 
         return $cc::DATABASE_CONNECTION_ID;
     }
 
-    protected static function getInstance() {
+    protected static function getInstance(): ?\PDO
+    {
         return DB::getInstanceById(self::DATABASE_CONNECTION_ID);
     }
 
-    protected static function prepare($statement) {
+    protected static function prepare(string $statement): PDOStatement
+    {
         return self::getInstance()->prepare($statement);
     }
 
@@ -42,29 +46,8 @@ abstract class ModelDAO
     }
 */
 
-    public static function create($object) {
-        try {
-            $statement = self::prepare('');
-// 			$statement->bindValue(1, $user->getLogin());
-
-            $statement->execute();
-        } catch (PDOException $e) {
-            die(__METHOD__.' : '.$e->getMessage().'<br/>');
-        }
-    }
-
-    public static function update($user) {
-        try {
-            $statement = self::prepare('');
-// 			$statement->bindValue(1, $user->getPassword());
-
-            $statement->execute();
-        } catch (PDOException $e) {
-            die(__METHOD__.' : '.$e->getMessage().'<br/>');
-        }
-    }
-
-    public static function delete($object) {
+/*
+    public static function delete(Model $object) {
         try {
             $statement = self::getInstance()->prepare('DELETE FROM '.self::getTableName().' WHERE id=?');
             $statement->bindValue(1, $object->getId());
@@ -73,20 +56,5 @@ abstract class ModelDAO
             die(__METHOD__.' : '.$e->getMessage().'<br/>');
         }
     }
-
-    public static function getAll() {
-        /*$objects = array();
-        try {
-            $statement = self::getInstance()->prepare('SELECT * FROM '.self::getTableName().'');
-
-            $statement->execute();
-
-            while ($rs = $statement->fetch(PDO::FETCH_OBJ))
-                $objects[] = new User($rs->login, $rs->password);
-        } catch (PDOException $e) {
-            die(__METHOD__.' : '.$e->getMessage().'<br/>');
-        }
-
-        return $objects;*/
-    }
+*/
 }

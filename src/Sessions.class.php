@@ -6,25 +6,29 @@ abstract class Sessions
 {
     public static $keyPrefix = '';
 
-    public static function isStarted() {
+    public static function isStarted(): bool
+    {
         return session_status() != PHP_SESSION_NONE;
     }
 
-    public static function start(/*...*/) {
+    public static function start(/*...*/): void
+    {
     if (!self::isStarted())
         session_start();
 
         // .... @TO-DO ?
     }
 
-    public static function getId() {
+    public static function getId()
+    {
         if (self::isStarted())
             return session_id();
 
         return false;
     }
 
-    public static function set($key, $value = '') {
+    public static function set(string $key, $value = null): bool
+    {
         if(self::isStarted()) {
             $_SESSION[self::$keyPrefix.$key] = $value;
 
@@ -34,23 +38,25 @@ abstract class Sessions
         return false;
     }
 
-    public static function exist($key) { // can't name this 'isset' as it's reserved by php.
+    public static function exist(string $key): bool
+    { // can't name this 'isset' as it's reserved by php.
         return self::isStarted() && isset($_SESSION[self::$keyPrefix.$key]);
     }
 
-    public static function get($key) {
+    public static function get(string $key)
+    {
         if(self::exist($key))
             return $_SESSION[self::$keyPrefix.$key];
-
-        return;
     }
 
-    public static function delete($key) {
+    public static function delete(string $key): void
+    {
         if(self::exist($key))
             unset($_SESSION[self::$keyPrefix.$key]);
     }
 
-    public static function destroy() {
+    public static function destroy(): void
+    {
         if (self::isStarted()) {
             session_unset();
             session_destroy();
