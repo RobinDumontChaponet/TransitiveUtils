@@ -18,7 +18,7 @@ abstract class Model
 
     public function setId($id = -1): void
     {
-        $this->id = trim(id);
+        $this->id = trim($id);
     }
 
     public function __toString()
