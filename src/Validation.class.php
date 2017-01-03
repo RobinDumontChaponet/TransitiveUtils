@@ -41,9 +41,9 @@ abstract class Validation
         return (isset(self::$formValidation[$formElementName])) ? self::$formValidation[$formElementName] : null;
     }
 
-    public static function invalidMessage(string $formElementName): string
+    public static function invalidMessage(string $formElementName): ?string
     {
-        return (($message = self::isValid($formElementName)) !== true) ? $message : '';
+        return (!empty($formElementName) && ($message = self::isValid($formElementName)) !== true) ? $message : '';
     }
 
     public static function is_valid_phoneNumber(string $number): bool
