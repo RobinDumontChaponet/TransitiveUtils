@@ -2,8 +2,6 @@
 
 namespace Transitive\Utils;
 
-// @TODO !
-
 // use Exception;
 use PDOException;
 use Transitive\Utils\Database as DB;
@@ -37,24 +35,14 @@ abstract class ModelDAO
         return self::getInstance()->prepare($statement);
     }
 
-/*    private static function _catch ($funct) {
-        try {
-            return $funct();
-        } catch (PDOExcection $e) {
-            die('argh : '.$e->getMessage());
-        }
-    }
-*/
-
-/*
-    public static function delete(Model $object) {
-        try {
-            $statement = self::getInstance()->prepare('DELETE FROM '.self::getTableName().' WHERE id=?');
-            $statement->bindValue(1, $object->getId());
+    public static function delete($object)
+    {
+	    try {
+            $statement = self::prepare('DELETE FROM '.self::getTableName().' WHERE id=?');
+            $statement->bindValue(1, $user->getId());
             $statement->execute();
         } catch (PDOException $e) {
-            die(__METHOD__.' : '.$e->getMessage().'<br/>');
+            die(__METHOD__.' : '.$e->getMessage().'<br />');
         }
     }
-*/
 }
