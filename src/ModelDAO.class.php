@@ -30,6 +30,26 @@ abstract class ModelDAO
         return DB::getInstanceById(self::DATABASE_CONNECTION_ID);
     }
 
+    protected static function beginTransaction(): bool
+    {
+        return self::getInstance()->beginTransaction();
+    }
+
+    protected static function commmit(): bool
+    {
+        return self::getInstance()->commit();
+    }
+
+    protected static function rollBack(): bool
+    {
+        return self::getInstance()->rollBack();
+    }
+
+    protected static function lastInsertId(string $name = null): string
+    {
+        return self::getInstance()->lastInsertId($name);
+    }
+
     protected static function prepare(string $statement): \PDOStatement
     {
         return self::getInstance()->prepare($statement);
@@ -37,7 +57,7 @@ abstract class ModelDAO
 
     public static function delete($object)
     {
-	    try {
+        try {
             $statement = self::prepare('DELETE FROM '.self::getTableName().' WHERE id=?');
             $statement->bindValue(1, $user->getId());
             $statement->execute();

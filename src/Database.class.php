@@ -55,6 +55,7 @@ class Database
                     array(
                         PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES utf8',
                         PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+                        PDO::ATTR_PERSISTENT => true,
                     )
                 );
             } catch (PDOException $e) {
@@ -78,7 +79,7 @@ class Database
 
     private function __clone()
     {
-        throw new Exception('<b>Error '.__METHOD__.' : You shall not clone this.<br />'.PHP_EOL);
+        throw new Exception('<b>Error '.__METHOD__.' : You shall not clone.<br />'.PHP_EOL);
     }
 
     public function __destruct()

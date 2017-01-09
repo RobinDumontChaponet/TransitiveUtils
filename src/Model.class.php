@@ -6,17 +6,17 @@ abstract class Model
 {
     protected $id;
 
-    public function __construct($id = -1)
+    public function __construct(int $id = -1)
     {
         $this->setId($id);
     }
 
-    public function getId(): string
+    public function getId(): int
     {
         return $this->id;
     }
 
-    public function setId($id = -1): void
+    public function setId(int $id = -1): void
     {
         $this->id = trim($id);
     }
@@ -24,15 +24,5 @@ abstract class Model
     public function __toString()
     {
         return  get_class().' [ id: '.$this->id.(((!get_parent_class())) ? ' ]' : ';  ');
-    }
-
-    public function toJson()
-    {
-        return 'TODO';
-    }
-
-    public function toXml()
-    {
-        return 'TODO';
     }
 }
