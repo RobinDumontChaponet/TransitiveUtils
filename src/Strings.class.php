@@ -118,7 +118,7 @@ abstract class Strings
         return $content;
     }
 
-    public static function random(int $length = 8):string
+    public static function random(int $length = 8): string
     {
         $chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()_-=+;:?';
         $password = substr(str_shuffle($chars), 0, $length);
