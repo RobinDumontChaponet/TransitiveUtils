@@ -11,7 +11,8 @@ function humanWeight($bytes, $decimals = 2) {
 
 abstract class Optimization
 {
-    public static function minify($src) {
+    public static function minify($src)
+    {
         // Nothing there (but us chickens) anymore... for now.
         // It didn't work well anyway...
     }
@@ -54,7 +55,7 @@ class Timed
          - ($rus["ru_$index.tv_sec"] * 1000 + intval($rus["ru_$index.tv_usec"] / 1000));
     }
 
-    public function printResult(): string
+    public function printResult(): void
     {
         $ru = getrusage();
         $time = microtime(true) - $_SERVER['REQUEST_TIME_FLOAT'];
