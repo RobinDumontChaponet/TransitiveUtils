@@ -65,4 +65,19 @@ abstract class ModelDAO
             die(__METHOD__.' : '.$e->getMessage().'<br />');
         }
     }
+
+    public static function count(): ?int
+    {
+        try {
+            $statement = self::prepare('SELECT COUNT(*) AS c FROM '.self::getTableName());
+
+            $statement->execute();
+
+            if ($rs = $statement->fetch(\PDO::FETCH_OBJ)) {
+                return $rs->c;
+            }
+        } catch (PDOException $e) {
+            throw new \Exception($e->getMessage());
+        }
+    }
 }
