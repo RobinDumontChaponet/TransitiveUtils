@@ -29,7 +29,8 @@ abstract class Optimization
         return $path['dirname'].'/'.$path['filename'].'.'.filemtime($src).'.'.$path['extension'];
     }
 
-    public static function listIncludes(): void {
+    public static function listIncludes(): void
+    {
         $includes = get_included_files();
 
         echo '<details><summary>', count($includes), ' include(s)', '</summary>', PHP_EOL;
