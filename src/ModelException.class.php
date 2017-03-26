@@ -4,28 +4,28 @@ namespace Transitive\Utils;
 
 class ModelException extends \Exception
 {
-	public function getMessages(): array
-	{
-		$messages = [$this->getMessage()];
+    public function getMessages(): array
+    {
+        $messages = [$this->getMessage()];
 
-		if($this->getPrevious())
-			$messages = array_merge($this->getPrevious()->getMessages(), $messages);
+        if($this->getPrevious())
+            $messages = array_merge($this->getPrevious()->getMessages(), $messages);
 
-		return $messages;
-	}
+        return $messages;
+    }
 
-	public function __toString(): string
-	{
-		$str = ''.$this->getPrevious().PHP_EOL;
-		$str.= ($str)?PHP_EOL:'';
+    public function __toString(): string
+    {
+        $str = ''.$this->getPrevious().PHP_EOL;
+        $str .= ($str) ? PHP_EOL : '';
 
-		$str.= $this->getMessage();
+        $str .= $this->getMessage();
 
-		return $str;
-	}
+        return $str;
+    }
 
-	public static function throw(self $e = null) {
-		if(isset($e))
-			throw $e;
-	}
+    public static function throw(self $e = null) {
+        if(isset($e))
+            throw $e;
+    }
 }
