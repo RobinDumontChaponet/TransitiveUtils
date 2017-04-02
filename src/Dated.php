@@ -19,7 +19,7 @@ trait Dated
      */
     protected $aTime;
 
-    protected function _init(int $time = null)
+    protected function _initDated(int $time = null)
     {
         $this->cTime = $time ?? time();
         $this->aTime = $time ?? time();

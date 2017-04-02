@@ -14,7 +14,7 @@ trait Named
      */
     protected $title;
 
-	protected function _init(string $name, string $title = '')
+	protected function _initNamed(string $name, string $title = '')
     {
         $this->name = $name;
         $this->title = $title;

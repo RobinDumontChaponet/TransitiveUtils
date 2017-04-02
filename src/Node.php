@@ -1,10 +1,10 @@
 <?php
 
-use Transitive\Utils as Utils;
+namespace Transitive\Utils;
 
 trait Node
 {
-	use Utils\Dated;
+	use Dated;
 
     /**
      * @var User
