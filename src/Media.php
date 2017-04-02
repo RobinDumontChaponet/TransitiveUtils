@@ -27,9 +27,9 @@ class Media extends Model
 
     private $maxSize;
 
-    public function __construct(int $id = -1, $type = 'image', $mimeType = 'image/jpeg', $extension = 'jpg', $maxSize = 'small', $name = null, $title = null)
+    public function __construct($type = 'image', $mimeType = 'image/jpeg', $extension = 'jpg', $maxSize = 'small', $name = null, $title = null)
     {
-        parent::__construct($id);
+        parent::__construct();
 
         $this->setType($type);
         $this->setMimeType($mimeType);
