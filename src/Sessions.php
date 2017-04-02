@@ -38,20 +38,24 @@ abstract class Sessions
         return false;
     }
 
-    public static function exist(string $key): bool
-    { // can't name this 'isset' as it's reserved by php.
+    public static function isset(string $key): bool
+    {
         return self::isStarted() && isset($_SESSION[self::$keyPrefix.$key]);
+    }
+    public static function exist(string $key): bool
+    {
+		return self::isset($key);
     }
 
     public static function get(string $key)
     {
-        if(self::exist($key))
+        if(self::isset($key))
             return $_SESSION[self::$keyPrefix.$key];
     }
 
     public static function delete(string $key): void
     {
-        if(self::exist($key))
+        if(self::isset($key))
             unset($_SESSION[self::$keyPrefix.$key]);
     }
 
