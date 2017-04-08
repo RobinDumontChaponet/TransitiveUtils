@@ -137,7 +137,7 @@ class User extends Model
     public function __toString(): string
     {
         $str = '<address class="user webspace">';
-        $str .= '	<a rel="author" href="/profile/'.$this->getId().'" target="_blank">'.$this->getLogin().'</a>';
+        $str .= '	<a rel="author" href="/users/'.$this->getId().'" target="_blank">'.$this->getLogin().'</a>';
         $str .= '</address>';
 
         return $str;
