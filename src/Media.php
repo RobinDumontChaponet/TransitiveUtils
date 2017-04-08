@@ -4,6 +4,8 @@ namespace Transitive\Utils;
 
 class Media extends Model
 {
+	public static $path = 'data/media';
+
     private static $types = ['image', 'sound', 'video'];
     private static $sizes = ['small', 'medium', 'large'];
 
@@ -72,7 +74,7 @@ class Media extends Model
     public function setType(string $type): void
     {
         if(!in_array($type, self::$types))
-            throw new \Exception('Invalid type');
+            throw new \Exception('Invalid type : '.$type);
         $this->type = $type;
     }
 
@@ -105,6 +107,11 @@ class Media extends Model
 
     public function __toString()
     {
-        return '<img src="'.PUBLIC_DATA.'media/'.$this->getMaxSize().'/'.$this->getId().'.'.$this->getExtension().'" alt="" />';
+	    $str = '<figure title="'.$this->getTitle().'">';
+		$str.= '<img src="'.self::$path.'/'.$this->getMaxSize().'/'.$this->getId().'.'.$this->getExtension().'" alt="" />';
+		$str.= '<figcaption>'.$this->getName().'</figcaption>';
+		$str.= '</figure>';
+
+		return $str;
     }
 }
