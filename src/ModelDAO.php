@@ -2,11 +2,10 @@
 
 namespace Transitive\Utils;
 
-// use Exception;
 use PDOException;
 use Transitive\Utils\Database as DB;
 
-abstract class ModelDAO
+abstract class ModelDAO implements CRUDInterface
 {
     const TABLE_NAME = '';
     const DATABASE_CONNECTION_ID = 'data';
@@ -35,7 +34,7 @@ abstract class ModelDAO
         return self::getInstance()->beginTransaction();
     }
 
-    protected static function commmit(): bool
+    protected static function commit(): bool
     {
         return self::getInstance()->commit();
     }
