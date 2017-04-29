@@ -4,7 +4,7 @@ namespace Transitive\Utils;
 
 class Media extends Model
 {
-	public static $path = 'data/media';
+    public static $path = 'data/media';
 
     private static $types = ['image', 'sound', 'video'];
     private static $sizes = ['small', 'medium', 'large'];
@@ -107,11 +107,11 @@ class Media extends Model
 
     public function __toString()
     {
-	    $str = '<figure title="'.$this->getTitle().'">';
-		$str.= '<img src="'.self::$path.'/'.$this->getMaxSize().'/'.$this->getId().'.'.$this->getExtension().'" alt="" />';
-		$str.= '<figcaption>'.$this->getName().'</figcaption>';
-		$str.= '</figure>';
+        $str = '<figure title="'.$this->getTitle().'">';
+        $str .= '<img src="'.self::$path.'/'.$this->getMaxSize().'/'.$this->getId().'.'.$this->getExtension().'" alt="" />';
+        $str .= '<figcaption>'.$this->getName().'</figcaption>';
+        $str .= '</figure>';
 
-		return $str;
+        return $str;
     }
 }

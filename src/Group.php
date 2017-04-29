@@ -4,7 +4,7 @@ namespace Transitive\Utils;
 
 class Group extends Model
 {
-	use Dated, Named;
+    use Dated, Named;
 
     /**
      * __constructor.

@@ -4,7 +4,7 @@ namespace Transitive\Utils;
 
 trait Node
 {
-	use Dated;
+    use Dated;
 
     /**
      * @var User
@@ -13,7 +13,7 @@ trait Node
 
     protected function _initNode()
     {
-	    $this->_initDated();
+        $this->_initDated();
     }
 
     public function getUser(): User

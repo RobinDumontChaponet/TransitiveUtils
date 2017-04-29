@@ -42,9 +42,10 @@ abstract class Sessions
     {
         return self::isStarted() && isset($_SESSION[self::$keyPrefix.$key]);
     }
+
     public static function exist(string $key): bool
     {
-		return self::isset($key);
+        return self::isset($key);
     }
 
     public static function get(string $key)

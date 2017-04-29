@@ -4,7 +4,7 @@ namespace Transitive\Utils;
 
 class User extends Model
 {
-	use Dated;
+    use Dated;
 
     /**
      * @var string

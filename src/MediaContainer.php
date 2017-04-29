@@ -29,7 +29,7 @@ trait MediaContainer
         $this->mediaLocked = $lock;
     }
 
-	public function hasMedia(): bool
+    public function hasMedia(): bool
     {
         return isset($this->media);
     }

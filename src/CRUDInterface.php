@@ -11,5 +11,4 @@ interface CRUDInterface
     public static function delete($object);
 
     public static function count(): ?int;
-
 }
