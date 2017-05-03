@@ -5,7 +5,7 @@ namespace Transitive\Utils;
 use PDO;
 use PDOException;
 
-class UserDAO extends ModelDao
+class UserDAO extends ModelDAO
 {
     const TABLE_NAME = 'User';
 
