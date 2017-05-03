@@ -4,7 +4,7 @@ namespace Transitive\Utils;
 
 class User extends Model
 {
-    use Dated;
+	use Dated;
 
     /**
      * @var string
@@ -31,6 +31,8 @@ class User extends Model
     public function __construct(int $id, string $emailAddress, string $passwordHash = null, array $groups = array())
     {
         parent::__construct($id);
+        $this->_initDated();
+
         $this->emailAddress = $emailAddress;
 
         if(isset($passwordHash))
