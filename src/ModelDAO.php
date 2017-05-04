@@ -58,8 +58,10 @@ abstract class ModelDAO implements CRUDInterface
     {
         try {
             $statement = self::prepare('DELETE FROM '.self::getTableName().' WHERE id=?');
-            $statement->bindValue(1, $user->getId());
+            $statement->bindValue(1, $object->getId());
             $statement->execute();
+
+            return $statement->rowCount();
         } catch (PDOException $e) {
             die(__METHOD__.' : '.$e->getMessage().'<br />');
         }
