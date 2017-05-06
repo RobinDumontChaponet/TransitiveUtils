@@ -12,8 +12,7 @@ abstract class MediaDAO extends ModelDAO
     public static function create(&$object)
     {
         try {
-            $statement = self::prepare('INSERT INTO '.self::getTableName().' (id, type, mimeType, extension, name, title, maxSize) values (:id, :type, :mimeType, :extension, :name, :title, :maxSize)');
-            $statement->bindValue(':id', $object->getId());
+            $statement = self::prepare('INSERT INTO '.self::getTableName().' (type, mimeType, extension, name, title, maxSize) values (:type, :mimeType, :extension, :name, :title, :maxSize)');
             $statement->bindValue(':type', $object->getType());
             $statement->bindValue(':mimeType', $object->getMimeType());
             $statement->bindValue(':extension', $object->getExtension());
@@ -33,7 +32,7 @@ abstract class MediaDAO extends ModelDAO
     public static function update(&$object)
     {
         try {
-            $statement = self::prepare('UPDATE '.self::getTableName().' SET id=:id, type=:type, mimeType=:mimeType, extension=:extension, name=:name, title=:title, maxSize=:maxSize WHERE id=:id');
+            $statement = self::prepare('UPDATE '.self::getTableName().' SET type=:type, mimeType=:mimeType, extension=:extension, name=:name, title=:title, maxSize=:maxSize WHERE id=:id');
             $statement->bindValue(':type', $object->getType());
             $statement->bindValue(':mimeType', $object->getMimeType());
             $statement->bindValue(':extension', $object->getExtension());
@@ -61,7 +60,7 @@ abstract class MediaDAO extends ModelDAO
             while ($rs = $statement->fetch(PDO::FETCH_OBJ)) {
                 $objects[$rs->id] = new Media($rs->type, $rs->mimeType, $rs->extension, $rs->maxSize, $rs->name, $rs->title);
                 $objects[$rs->id]->setId($rs->id);
-            }
+			}
         } catch (PDOException $e) {
             die(__METHOD__.' : '.$e->getMessage().'<br />');
         }
@@ -81,7 +80,7 @@ abstract class MediaDAO extends ModelDAO
             if($rs = $statement->fetch(PDO::FETCH_OBJ)) {
                 $object = new Media($rs->type, $rs->mimeType, $rs->extension, $rs->maxSize, $rs->name, $rs->title);
                 $object->setId($rs->id);
-            }
+			}
         } catch (PDOException $e) {
             die(__METHOD__.' : '.$e->getMessage().'<br />');
         }
