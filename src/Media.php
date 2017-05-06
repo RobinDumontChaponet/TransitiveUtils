@@ -4,7 +4,7 @@ namespace Transitive\Utils;
 
 class Media extends Model
 {
-    public static $path = 'data/media';
+	public static $path = 'data/media';
 
     private static $types = ['image', 'sound', 'video'];
     private static $sizes = ['small', 'medium', 'large'];
@@ -28,6 +28,26 @@ class Media extends Model
     private $title;
 
     private $maxSize;
+
+    private static $editableId = 0;
+
+    public static function editable(Media $media = null, string $name = null): string
+    {
+	    if(empty($media))
+			$media = new Media();
+
+		$str = '<figure class="media auto-init" title="'.($media->getTitle() ?? 'Ajouter un média').'">';
+		$str.= '<label for="mediaInput'.self::$editableId.'">Téléverser</label>';
+		$str.= '<input type="file" id="mediaInput'.self::$editableId.'" name="mediaUpload" />';
+		$str.= '<input type="hidden" name="'.($name ?? 'media'.self::$editableId).'" disabled="disabled" />';
+	    if($media->id > 0)
+			$str.= '<img src="'.self::$path.'/'.$media->getMaxSize().'/'.$media->getId().'.'.$media->getExtension().'" alt="" />';
+		$str.= '<figcaption>'.($media->getName() ?? '').'</figcaption>';
+		$str.= '</figure>';
+		self::$editableId++;
+
+		return $str;
+    }
 
     public function __construct($type = 'image', $mimeType = 'image/jpeg', $extension = 'jpg', $maxSize = 'small', $name = null, $title = null)
     {
@@ -107,11 +127,12 @@ class Media extends Model
 
     public function __toString()
     {
-        $str = '<figure title="'.$this->getTitle().'">';
-        $str .= '<img src="'.self::$path.'/'.$this->getMaxSize().'/'.$this->getId().'.'.$this->getExtension().'" alt="" />';
-        $str .= '<figcaption>'.$this->getName().'</figcaption>';
-        $str .= '</figure>';
+	    $str = '<figure title="'.$this->getTitle().'">';
+	    if($this->id > 0)
+			$str.= '<img src="'.self::$path.'/'.$this->getMaxSize().'/'.$this->getId().'.'.$this->getExtension().'" alt="" />';
+		$str.= '<figcaption>'.$this->getName().'</figcaption>';
+		$str.= '</figure>';
 
-        return $str;
+		return $str;
     }
 }
