@@ -12,6 +12,8 @@ class UserDAO extends ModelDAO
     public static function create(&$user)
     {
         try {
+	        self::beginTransaction();
+
             $statement = self::prepare('INSERT INTO '.self::getTableName().' (emailAddress, passwordHash, cTime, mTime, aTime, sessionHash) values (:emailAddress, :passwordHash, :cTime, :mTime, :aTime, :sessionHash)');
             $statement->bindValue(':emailAddress', $user->getEmailAddress());
             $statement->bindValue(':passwordHash', $user->getPasswordHash());
@@ -27,8 +29,11 @@ class UserDAO extends ModelDAO
             foreach($user->getGroups() as $group)
                 self::addInGroup($user, $group);
 
+			self::commit();
+
             return $user->getId();
         } catch (PDOException $e) {
+	        self::rollBack();
             die(__METHOD__.' : '.$e->getMessage().'<br />');
         }
     }
@@ -36,6 +41,8 @@ class UserDAO extends ModelDAO
     public static function update(&$user)
     {
         try {
+	        self::beginTransaction();
+
             $statement = self::prepare('UPDATE '.self::getTableName().' SET emailAddress=:emailAddress, passwordHash=:passwordHash, cTime=:cTime, mTime=:mTime, aTime=:aTime, sessionHash=:sessionHash WHERE id=:id');
             $statement->bindValue(':id', $user->getId());
             $statement->bindValue(':emailAddress', $user->getEmailAddress());
@@ -50,8 +57,11 @@ class UserDAO extends ModelDAO
 
             self::_updateGroups($user);
 
+            self::commit();
+
             return self::getInstance()->lastInsertId();
         } catch (PDOException $e) {
+	        self::rollBack();
             die(__METHOD__.' : '.$e->getMessage().'<br />');
         }
     }
@@ -66,7 +76,8 @@ class UserDAO extends ModelDAO
             $statement->execute();
 
             while ($rs = $statement->fetch(PDO::FETCH_OBJ)) {
-                $objects[$rs->login] = new User($rs->id, $rs->emailAddress);
+                $objects[$rs->id] = new User($rs->emailAddress);
+                $objects[$rs->id]->setId($rs->id);
             }
         } catch (PDOException $e) {
             die(__METHOD__.' : '.$e->getMessage().'<br />');
@@ -85,7 +96,8 @@ class UserDAO extends ModelDAO
             $statement->execute();
 
             if($rs = $statement->fetch(PDO::FETCH_OBJ)) {
-                $object = new User($id, $rs->emailAddress, $rs->passwordHash);
+                $object = new User($rs->emailAddress, $rs->passwordHash);
+                $object->setId($id);
                 $object->setGroups(GroupDAO::getByUser($object));
 
                 $object->setCreationTime($rs->cTime);
@@ -109,7 +121,8 @@ class UserDAO extends ModelDAO
             $statement->execute();
 
             if($rs = $statement->fetch(PDO::FETCH_OBJ)) {
-                $object = new User($rs->id, $login, $rs->passwordHash);
+                $object = new User($login, $rs->passwordHash);
+                $object->setId($rs->id);
                 $object->setGroups(GroupDAO::getByUser($object));
 
                 $object->setCreationTime($rs->cTime);
@@ -137,7 +150,7 @@ class UserDAO extends ModelDAO
 
     public static function removeFromGroup(User $user, Group $group) {
         try {
-            $statement = self::prepare('DELETE FROM `inGroup` WHERE `userId`=:userId AND `groupId`=:groupId)');
+            $statement = self::prepare('DELETE FROM `inGroup` WHERE `userId`=:userId AND `groupId`=:groupId');
             $statement->bindValue(':userId', $user->getId());
             $statement->bindValue(':groupId', $group->getId());
 

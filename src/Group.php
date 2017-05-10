@@ -9,12 +9,11 @@ class Group extends Model
     /**
      * __constructor.
      *
-     * @param int    $id   (default: -1)
      * @param string $name
      */
-    public function __construct(int $id, string $name)
+    public function __construct(string $name)
     {
-        parent::__construct($id);
+        parent::__construct();
 
         $this->_initNamed($name);
     }

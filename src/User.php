@@ -28,9 +28,9 @@ class User extends Model
 
     private const HASH_COST = 12;
 
-    public function __construct(int $id, string $emailAddress, string $passwordHash = null, array $groups = array())
+    public function __construct(string $emailAddress, string $passwordHash = null, array $groups = array())
     {
-        parent::__construct($id);
+        parent::__construct();
         $this->_initDated();
 
         $this->emailAddress = $emailAddress;
@@ -77,7 +77,7 @@ class User extends Model
         if(!Validation::is_valid_email($emailAddress))
             $e = new ModelException('L\'adresse-email doit être dans un format valide.', null, $e);
 
-        if(strlen($title) > 128)
+        if(strlen($emailAddress) > 128)
             $e = new ModelException('L\'adresse-email doit être au maximum de 128 caractères.', null, $e);
 
         ModelException::throw($e);
@@ -139,7 +139,7 @@ class User extends Model
     public function __toString(): string
     {
         $str = '<address class="user webspace">';
-        $str .= '	<a rel="author" href="/users/'.$this->getId().'" target="_blank">'.$this->getLogin().'</a>';
+        $str .= '	<a rel="author" href="/users/'.$this->getId().'">'.$this->getLogin().'</a>';
         $str .= '</address>';
 
         return $str;

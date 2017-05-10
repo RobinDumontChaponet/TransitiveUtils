@@ -48,8 +48,10 @@ class GroupDAO extends ModelDAO
 
             $statement->execute();
 
-            while ($rs = $statement->fetch(PDO::FETCH_OBJ))
-                $objects[$rs->id] = new Group($rs->id, $rs->name);
+            while ($rs = $statement->fetch(PDO::FETCH_OBJ)) {
+                $objects[$rs->id] = new Group($rs->name);
+                $objects[$rs->id]->setId($rs->id);
+			}
         } catch (PDOException $e) {
             die(__METHOD__.' : '.$e->getMessage().'<br />');
         }
@@ -66,8 +68,10 @@ class GroupDAO extends ModelDAO
             $statement->bindParam(1, $id);
             $statement->execute();
 
-            if($rs = $statement->fetch(PDO::FETCH_OBJ))
-                $object = new Group($rs->id, $rs->name);
+            if($rs = $statement->fetch(PDO::FETCH_OBJ)) {
+                $object = new Group($rs->name);
+                $object->setId($id);
+			}
         } catch (PDOException $e) {
             die(__METHOD__.' : '.$e->getMessage().'<br />');
         }
@@ -85,8 +89,10 @@ class GroupDAO extends ModelDAO
 
             $statement->execute();
 
-            while ($rs = $statement->fetch(PDO::FETCH_OBJ))
-                $objects[$rs->id] = new Group($rs->id, $rs->name);
+            while ($rs = $statement->fetch(PDO::FETCH_OBJ)) {
+                $objects[$rs->id] = new Group($rs->name);
+                $objects[$rs->id]->setId($rs->id);
+			}
         } catch (PDOException $e) {
             die(__METHOD__.' : '.$e->getMessage().'<br />');
         }
@@ -105,8 +111,10 @@ class GroupDAO extends ModelDAO
 
             $statement->execute();
 
-            while ($rs = $statement->fetch(PDO::FETCH_OBJ))
-                $objects[$rs->id] = new Group($rs->id, $rs->name);
+            while ($rs = $statement->fetch(PDO::FETCH_OBJ)) {
+                $objects[$rs->id] = new Group($rs->name);
+                $objects[$rs->id]->setId($rs->id);
+			}
         } catch (PDOException $e) {
             die(__METHOD__.' : '.$e->getMessage().'<br />');
         }
