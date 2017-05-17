@@ -11,6 +11,11 @@ class User extends Model
      */
     private $emailAddress;
 
+	/**
+     * @var string
+     */
+    private $pseudonym;
+
     /**
      * @var string
      */
@@ -28,12 +33,14 @@ class User extends Model
 
     private const HASH_COST = 12;
 
-    public function __construct(string $emailAddress, string $passwordHash = null, array $groups = array())
+    public function __construct(string $emailAddress, string $pseudonym, string $passwordHash = null, array $groups = array())
     {
         parent::__construct();
         $this->_initDated();
 
         $this->emailAddress = $emailAddress;
+
+        $this->pseudonym = $pseudonym;
 
         if(isset($passwordHash))
             $this->setPasswordHash($passwordHash);
@@ -134,6 +141,27 @@ class User extends Model
     public function hasGroupById(int $groupId): bool
     {
         return isset($this->groups[$groupId]);
+    }
+
+    public function getPseudonym(): string
+    {
+        return $this->pseudonym;
+    }
+
+    public function setPseudonym(string $pseudonym): void
+    {
+        $e = null;
+        $pseudonym = trim($pseudonym);
+
+        if(is_numeric($pseudonym))
+            $e = new ModelException('Le pseudonyme ne peut pas être constitué de chiffres seulement.', null, $e);
+
+        if(strlen($pseudonym) > 40)
+            $e = new ModelException('Le pseudonyme ne peut contenir plus de 20 caractères.', null, $e);
+
+        ModelException::throw($e);
+
+        $this->pseudonym = $pseudonym;
     }
 
     public function __toString(): string
