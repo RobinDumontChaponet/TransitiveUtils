@@ -21,8 +21,8 @@ class UserDAO extends ModelDAO
             $statement->bindValue(':passwordHash', $user->getPasswordHash());
 
             $statement->bindValue(':cTime', $user->getCreationTime()->getTimestamp());
-            $statement->bindValue(':mTime', ($object->getModificationTime())?$object->getModificationTime()->getTimestamp():null);
-            $statement->bindValue(':aTime', ($object->getAccessTime())?$object->getAccessTime()->getTimestamp():null);
+            $statement->bindValue(':mTime', ($user->getModificationTime())?$user->getModificationTime()->getTimestamp():null);
+            $statement->bindValue(':aTime', ($user->getAccessTime())?$user->getAccessTime()->getTimestamp():null);
             $statement->bindValue(':sessionHash', $user->getSessionHash());
 
             $statement->execute();
@@ -52,8 +52,8 @@ class UserDAO extends ModelDAO
             $statement->bindValue(':passwordHash', $user->getPasswordHash());
 
             $statement->bindValue(':cTime', $user->getCreationTime()->getTimestamp());
-            $statement->bindValue(':mTime', ($object->getModificationTime())?$object->getModificationTime()->getTimestamp():null);
-            $statement->bindValue(':aTime', ($object->getAccessTime())?$object->getAccessTime()->getTimestamp():null);
+            $statement->bindValue(':mTime', ($user->getModificationTime())?$user->getModificationTime()->getTimestamp():null);
+            $statement->bindValue(':aTime', ($user->getAccessTime())?$user->getAccessTime()->getTimestamp():null);
             $statement->bindValue(':sessionHash', $user->getSessionHash());
 
             $statement->execute();

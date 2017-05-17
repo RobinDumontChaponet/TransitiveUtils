@@ -2,6 +2,8 @@
 
 namespace Transitive\Utils;
 
+use DateTime;
+
 class User extends Model
 {
 	use Dated;
@@ -177,7 +179,7 @@ class User extends Model
     {
         Sessions::set('user', $this);
 
-        $this->aTime = time();
+        $this->aTime = new DateTime();
         $this->sessionHash = Sessions::getId();
 
         UserDAO::update($this);
