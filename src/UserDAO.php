@@ -4,6 +4,7 @@ namespace Transitive\Utils;
 
 use PDO;
 use PDOException;
+use Datetime;
 
 class UserDAO extends ModelDAO
 {
@@ -14,13 +15,14 @@ class UserDAO extends ModelDAO
         try {
 	        self::beginTransaction();
 
-            $statement = self::prepare('INSERT INTO '.self::getTableName().' (emailAddress, passwordHash, cTime, mTime, aTime, sessionHash) values (:emailAddress, :passwordHash, :cTime, :mTime, :aTime, :sessionHash)');
+            $statement = self::prepare('INSERT INTO '.self::getTableName().' (emailAddress, pseudonym, passwordHash, cTime, mTime, aTime, sessionHash) values (:emailAddress, :pseudonym, :passwordHash, :cTime, :mTime, :aTime, :sessionHash)');
             $statement->bindValue(':emailAddress', $user->getEmailAddress());
+            $statement->bindValue(':pseudonym', $user->getPseudonym());
             $statement->bindValue(':passwordHash', $user->getPasswordHash());
 
-            $statement->bindValue(':cTime', $user->getCreationTime());
-            $statement->bindValue(':mTime', $user->getModificationTime());
-            $statement->bindValue(':aTime', $user->getAccessTime());
+            $statement->bindValue(':cTime', $user->getCreationTime()->getTimestamp());
+            $statement->bindValue(':mTime', ($object->getModificationTime())?$object->getModificationTime()->getTimestamp():null);
+            $statement->bindValue(':aTime', ($object->getAccessTime())?$object->getAccessTime()->getTimestamp():null);
             $statement->bindValue(':sessionHash', $user->getSessionHash());
 
             $statement->execute();
@@ -43,14 +45,15 @@ class UserDAO extends ModelDAO
         try {
 	        self::beginTransaction();
 
-            $statement = self::prepare('UPDATE '.self::getTableName().' SET emailAddress=:emailAddress, passwordHash=:passwordHash, cTime=:cTime, mTime=:mTime, aTime=:aTime, sessionHash=:sessionHash WHERE id=:id');
+            $statement = self::prepare('UPDATE '.self::getTableName().' SET emailAddress=:emailAddress, pseudonym=:pseudonym, passwordHash=:passwordHash, cTime=:cTime, mTime=:mTime, aTime=:aTime, sessionHash=:sessionHash WHERE id=:id');
             $statement->bindValue(':id', $user->getId());
             $statement->bindValue(':emailAddress', $user->getEmailAddress());
+            $statement->bindValue(':pseudonym', $user->getPseudonym());
             $statement->bindValue(':passwordHash', $user->getPasswordHash());
 
-            $statement->bindValue(':cTime', $user->getCreationTime());
-            $statement->bindValue(':mTime', $user->getModificationTime());
-            $statement->bindValue(':aTime', $user->getAccessTime());
+            $statement->bindValue(':cTime', $user->getCreationTime()->getTimestamp());
+            $statement->bindValue(':mTime', ($object->getModificationTime())?$object->getModificationTime()->getTimestamp():null);
+            $statement->bindValue(':aTime', ($object->getAccessTime())?$object->getAccessTime()->getTimestamp():null);
             $statement->bindValue(':sessionHash', $user->getSessionHash());
 
             $statement->execute();
@@ -76,7 +79,7 @@ class UserDAO extends ModelDAO
             $statement->execute();
 
             while ($rs = $statement->fetch(PDO::FETCH_OBJ)) {
-                $objects[$rs->id] = new User($rs->emailAddress);
+                $objects[$rs->id] = new User($rs->emailAddress, $rs->pseudonym);
                 $objects[$rs->id]->setId($rs->id);
             }
         } catch (PDOException $e) {
@@ -91,18 +94,20 @@ class UserDAO extends ModelDAO
         $object = null;
 
         try {
-            $statement = self::prepare('SELECT emailAddress, passwordHash, cTime, mTime, aTime, sessionHash FROM '.self::getTableName().' WHERE id=:id');
+            $statement = self::prepare('SELECT emailAddress, pseudonym, passwordHash, cTime, mTime, aTime, sessionHash FROM '.self::getTableName().' WHERE id=:id');
             $statement->bindParam(':id', $id);
             $statement->execute();
 
             if($rs = $statement->fetch(PDO::FETCH_OBJ)) {
-                $object = new User($rs->emailAddress, $rs->passwordHash);
+                $object = new User($rs->emailAddress, $rs->pseudonym, $rs->passwordHash);
                 $object->setId($id);
                 $object->setGroups(GroupDAO::getByUser($object));
 
-                $object->setCreationTime($rs->cTime);
-                $object->setModificationTime($rs->mTime);
-                $object->setAccessTime($rs->aTime);
+                $object->setCreationTime(new DateTime('@'.$rs->cTime));
+                if($rs->mTime)
+	                $object->setModificationTime(new DateTime('@'.$rs->mTime));
+				if($rs->aTime)
+	                $object->setAccessTime(new DateTime('@'.$rs->aTime));
             }
         } catch (PDOException $e) {
             die(__METHOD__.' : '.$e->getMessage().'<br />');
@@ -116,18 +121,20 @@ class UserDAO extends ModelDAO
         $object = null;
 
         try {
-            $statement = self::prepare('SELECT id, passwordHash, cTime, mTime, aTime, sessionHash FROM '.self::getTableName().' WHERE emailAddress=:login');
+            $statement = self::prepare('SELECT id, pseudonym, passwordHash, cTime, mTime, aTime, sessionHash FROM '.self::getTableName().' WHERE emailAddress=:login');
             $statement->bindParam(':login', $login);
             $statement->execute();
 
             if($rs = $statement->fetch(PDO::FETCH_OBJ)) {
-                $object = new User($login, $rs->passwordHash);
+                $object = new User($login, $rs->pseudonym, $rs->passwordHash);
                 $object->setId($rs->id);
                 $object->setGroups(GroupDAO::getByUser($object));
 
-                $object->setCreationTime($rs->cTime);
-                $object->setModificationTime($rs->mTime);
-                $object->setAccessTime($rs->aTime);
+                $object->setCreationTime(new DateTime('@'.$rs->cTime));
+                if($rs->mTime)
+	                $object->setModificationTime(new DateTime('@'.$rs->mTime));
+	            if($rs->aTime)
+	                $object->setAccessTime(new DateTime('@'.$rs->aTime));
             }
         } catch (PDOException $e) {
             die(__METHOD__.' : '.$e->getMessage().'<br />');

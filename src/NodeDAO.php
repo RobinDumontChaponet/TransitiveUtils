@@ -17,8 +17,8 @@ abstract class NodeDAO extends ModelDAO
             $statement = self::prepare('INSERT INTO `Node` (userId, cTime, mTime, aTime) values (:userId, :cTime, :mTime, :aTime)');
             $statement->bindValue(':userId', $object->getUser()->getId());
             $statement->bindValue(':cTime', $object->getCreationTime());
-            $statement->bindValue(':mTime', $object->getModificationTime());
-            $statement->bindValue(':aTime', $object->getAccessTime());
+            $statement->bindValue(':mTime', ($object->getModificationTime())?$object->getModificationTime()->getTimestamp():null);
+            $statement->bindValue(':aTime', ($object->getAccessTime())?$object->getAccessTime()->getTimestamp():null);
 
             $statement->execute();
             $object->setId(self::lastInsertId());
@@ -40,8 +40,8 @@ abstract class NodeDAO extends ModelDAO
             $statement = self::prepare('UPDATE `Node` SET userId=:userId, cTime=:cTime, mTime=:mTime, aTime=:aTime WHERE id=:id');
             $statement->bindValue(':userId', $object->getUser()->getId());
             $statement->bindValue(':cTime', $object->getCreationTime());
-            $statement->bindValue(':mTime', $object->getModificationTime());
-            $statement->bindValue(':aTime', $object->getAccessTime());
+            $statement->bindValue(':mTime', ($object->getModificationTime())?$object->getModificationTime()->getTimestamp():null);
+            $statement->bindValue(':aTime', ($object->getAccessTime())?$object->getAccessTime()->getTimestamp():null);
             $statement->bindValue(':id', $object->getId());
 
             $statement->execute();
@@ -80,9 +80,11 @@ abstract class NodeDAO extends ModelDAO
 	            if($rs->userId)
 	                $node->setUser(UserDAO::getById($rs->userId));
 
-	            $node->setCreationTime($rs->cTime);
-	            $node->setModificationTime($rs->mTime);
-	            $node->setAccessTime($rs->aTime);
+	            $node->setCreationTime(new DateTime('@'.$rs->cTime));
+	            if($rs->mTime)
+		            $node->setModificationTime(new DateTime('@'.$rs->mTime));
+		        if($rs->aTime)
+		            $node->setAccessTime(new DateTime('@'.$rs->aTime));
             }
         } catch (PDOException $e) {
             die(__METHOD__.' : '.$e->getMessage().'<br />');
