@@ -74,7 +74,7 @@ class UserDAO extends ModelDAO
         $objects = array();
 
         try {
-            $statement = self::prepare('SELECT id, emailAddress FROM '.self::getTableName());
+            $statement = self::prepare('SELECT id, emailAddress, pseudonym FROM '.self::getTableName());
 
             $statement->execute();
 

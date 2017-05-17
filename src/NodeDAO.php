@@ -4,6 +4,7 @@ namespace Transitive\Utils;
 
 use PDO;
 use PDOException;
+use DateTime;
 
 abstract class NodeDAO extends ModelDAO
 {
@@ -11,12 +12,12 @@ abstract class NodeDAO extends ModelDAO
     {
         self::beginTransaction();
 
-        $object->setCreationTime(time());
+        $object->setCreationTime(new DateTime());
 
         try {
             $statement = self::prepare('INSERT INTO `Node` (userId, cTime, mTime, aTime) values (:userId, :cTime, :mTime, :aTime)');
             $statement->bindValue(':userId', $object->getUser()->getId());
-            $statement->bindValue(':cTime', $object->getCreationTime());
+            $statement->bindValue(':cTime', $object->getCreationTime()->getTimestamp());
             $statement->bindValue(':mTime', ($object->getModificationTime())?$object->getModificationTime()->getTimestamp():null);
             $statement->bindValue(':aTime', ($object->getAccessTime())?$object->getAccessTime()->getTimestamp():null);
 
@@ -34,12 +35,12 @@ abstract class NodeDAO extends ModelDAO
     {
         self::beginTransaction();
 
-        $object->setModificationTime(time());
+        $object->setModificationTime(new DateTime());
 
         try {
             $statement = self::prepare('UPDATE `Node` SET userId=:userId, cTime=:cTime, mTime=:mTime, aTime=:aTime WHERE id=:id');
             $statement->bindValue(':userId', $object->getUser()->getId());
-            $statement->bindValue(':cTime', $object->getCreationTime());
+            $statement->bindValue(':cTime', $object->getCreationTime()->getTimestamp());
             $statement->bindValue(':mTime', ($object->getModificationTime())?$object->getModificationTime()->getTimestamp():null);
             $statement->bindValue(':aTime', ($object->getAccessTime())?$object->getAccessTime()->getTimestamp():null);
             $statement->bindValue(':id', $object->getId());

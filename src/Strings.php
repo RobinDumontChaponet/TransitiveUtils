@@ -159,7 +159,7 @@ abstract class Strings
 	        $format[] = '%h '.$doPlural($interval->h, 'heure');
 	    }
 	    if($interval->i !== 0) {
-	        $format[] = '%i '.$doPlural($interval->i, 'minutes');
+	        $format[] = '%i '.$doPlural($interval->i, 'minute');
 	    }
 	    if($interval->s !== 0) {
 	        if(!count($format)) {
