@@ -169,7 +169,7 @@ class User extends Model
     public function __toString(): string
     {
         $str = '<address class="user webspace">';
-        $str .= '	<a rel="author" href="/users/'.$this->getId().'">'.$this->getPseudonym().' ('.$this->getEmailAddress().')</a>';
+        $str .= '	<a rel="author" href="/users/'.$this->getId().'">'.$this->getPseudonym().'</a>';
         $str .= '</address>';
 
         return $str;

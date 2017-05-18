@@ -178,4 +178,29 @@ class UserDAO extends ModelDAO
         foreach(array_diff($news, $olds) as $added)
             self::addInGroup($user, $added);
     }
+
+    public static function search(string $pseudonym, int $limit = null, int $offset = null): array
+	{
+		$objects = array();
+
+        try {
+            $statement = self::prepare('SELECT * FROM '.self::getTableName().' WHERE pseudonym LIKE :pseudonym'. (($limit)?' LIMIT :limit':'').(($offset)?' OFFSET :offset':''));
+            $statement->bindValue(':pseudonym', '%'.$pseudonym.'%');
+            if($limit)
+				$statement->bindParam(':limit', $limit, PDO::PARAM_INT);
+			if($offset)
+	            $statement->bindParam(':offset', $offset, PDO::PARAM_INT);
+
+            $statement->execute();
+
+            while ($rs = $statement->fetch(PDO::FETCH_OBJ)) {
+                $objects[$rs->id] = new User($rs->emailAddress, $pseudonym);
+                $objects[$rs->id]->setId($rs->id);
+            }
+        } catch (PDOException $e) {
+            throw new DAOException($e->getMessage());
+        }
+
+        return $objects;
+	}
 }
