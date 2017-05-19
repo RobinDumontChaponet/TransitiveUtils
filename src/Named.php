@@ -14,7 +14,7 @@ trait Named
      */
     protected $title;
 
-    protected function _initNamed(string $name, string $title = '')
+    protected function _initNamed(string $name, string $title = null)
     {
         $this->name = $name;
         $this->title = $title;
@@ -27,7 +27,7 @@ trait Named
 
     public function getTitle(): string
     {
-        return $this->title;
+        return $this->title ?? '';
     }
 
     public function setName(string $name): void
@@ -60,5 +60,16 @@ trait Named
         ModelException::throw($e);
 
         $this->title = $title;
+    }
+
+    protected function _namedJsonSerialize(): array
+    {
+		$array = [
+			'name' => htmlentities($this->getName()),
+		];
+		if(isset($this->title))
+			$array['title'] = htmlentities($this->getTitle());
+
+		return $array;
     }
 }

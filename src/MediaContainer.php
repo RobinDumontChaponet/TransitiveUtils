@@ -43,4 +43,12 @@ trait MediaContainer
     {
         return $this->mediaLocked;
     }
+
+    protected function _mediaContainerJsonSerialize(): array
+    {
+		return [
+			'media' => $this->getMedia(),
+            'mediaLocked' => $this->isMediaLocked()
+		];
+    }
 }

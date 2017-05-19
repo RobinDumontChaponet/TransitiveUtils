@@ -56,4 +56,13 @@ trait Dated
     {
         $this->aTime = $aTime;
     }
+
+    protected function _datedJsonSerialize(): array
+    {
+		return [
+			'cTime' => $this->getCreationTime()->getTimestamp(),
+			'mTime' => ($this->getModificationTime())?$this->getModificationTime()->getTimestamp():null,
+			'aTime' => ($this->getAccessTime())?$this->getAccessTime()->getTimestamp():null
+		];
+    }
 }

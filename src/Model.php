@@ -2,7 +2,7 @@
 
 namespace Transitive\Utils;
 
-abstract class Model
+abstract class Model implements \JsonSerializable
 {
     protected $id;
 
@@ -24,5 +24,12 @@ abstract class Model
     public function __toString()
     {
         return  get_class().' [ id: '.$this->id.(((!get_parent_class())) ? ' ]' : ';  ');
+    }
+
+    public function jsonSerialize()
+    {
+        return [
+            'id' => $this->getId()
+        ];
     }
 }

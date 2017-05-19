@@ -25,4 +25,11 @@ trait Node
     {
         $this->user = $user;
     }
+
+    protected function _nodeJsonSerialize(): array
+    {
+		return [
+			'user' => $this->getUser()
+		]+$this->_datedJsonSerialize();
+    }
 }

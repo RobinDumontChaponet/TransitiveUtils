@@ -4,7 +4,7 @@ namespace Transitive\Utils;
 
 use DateTime;
 
-class User extends Model
+class User extends Model implements \JsonSerializable
 {
 	use Dated;
 
@@ -183,5 +183,14 @@ class User extends Model
         $this->sessionHash = Sessions::getId();
 
         UserDAO::update($this);
+    }
+
+    public function jsonSerialize()
+    {
+		return parent::jsonSerialize()
+		+[
+			'pseudonyme' => htmlentities($this->getPseudonym()),
+			'groups' => $this->getGroups()
+		];
     }
 }

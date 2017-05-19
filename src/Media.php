@@ -2,8 +2,10 @@
 
 namespace Transitive\Utils;
 
-class Media extends Model
+class Media extends Model implements \JsonSerializable
 {
+	use Named;
+
 	public static $path = 'data/media';
 
     private static $types = ['image', 'sound', 'video'];
@@ -23,9 +25,6 @@ class Media extends Model
      * @var string
      */
     private $extension;
-
-    private $name;
-    private $title;
 
     private $maxSize;
 
@@ -53,12 +52,12 @@ class Media extends Model
     {
         parent::__construct();
 
+        $this->_initNamed($name ?? '', $title);
+
         $this->setType($type);
         $this->setMimeType($mimeType);
         $this->setExtension($extension);
         $this->setMaxSize($maxSize);
-        $this->setName($name);
-        $this->setTitle($title);
     }
 
     public function getType(): string
@@ -74,16 +73,6 @@ class Media extends Model
     public function getExtension(): string
     {
         return $this->extension;
-    }
-
-    public function getName(): ?string
-    {
-        return $this->name;
-    }
-
-    public function getTitle(): ?string
-    {
-        return $this->title;
     }
 
     public function getMaxSize(): string
@@ -108,16 +97,6 @@ class Media extends Model
         $this->extension = $extension;
     }
 
-    public function setName(string $name = null): void
-    {
-        $this->name = $name;
-    }
-
-    public function setTitle(string $title = null): void
-    {
-        $this->title = $title;
-    }
-
     public function setMaxSize(string $maxSize): void
     {
         if(!in_array($maxSize, self::$sizes))
@@ -134,5 +113,16 @@ class Media extends Model
 		$str.= '</figure>';
 
 		return $str;
+    }
+
+    public function jsonSerialize()
+    {
+        return parent::jsonSerialize()+[
+            'type' => htmlentities($this->getType()),
+            'mime' => htmlentities($this->getMimeType()),
+            'extension' => htmlentities($this->getExtension()),
+            'maxSize' => htmlentities($this->getMaxSize()),
+            'path' => htmlentities(self::$path)
+        ]+$this->_namedJsonSerialize();
     }
 }

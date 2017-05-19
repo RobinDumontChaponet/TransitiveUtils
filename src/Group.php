@@ -2,9 +2,9 @@
 
 namespace Transitive\Utils;
 
-class Group extends Model
+class Group extends Model implements \JsonSerializable
 {
-    use Dated, Named;
+    use Named;
 
     /**
      * __constructor.
@@ -21,5 +21,11 @@ class Group extends Model
     public function __toString(): string
     {
         return '<span class="group">'.$this->name.'('.$this->id.')</span>';
+    }
+
+    public function jsonSerialize()
+    {
+		return parent::jsonSerialize()
+		+$this->_namedJsonSerialize();
     }
 }
