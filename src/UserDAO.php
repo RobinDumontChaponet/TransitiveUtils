@@ -74,13 +74,19 @@ class UserDAO extends ModelDAO
         $objects = array();
 
         try {
-            $statement = self::prepare('SELECT id, emailAddress, pseudonym FROM '.self::getTableName());
+            $statement = self::prepare('SELECT id, emailAddress, pseudonym, cTime, mTime, aTime FROM '.self::getTableName());
 
             $statement->execute();
 
             while ($rs = $statement->fetch(PDO::FETCH_OBJ)) {
                 $objects[$rs->id] = new User($rs->emailAddress, $rs->pseudonym);
                 $objects[$rs->id]->setId($rs->id);
+
+				$objects[$rs->id]->setCreationTime(new DateTime('@'.$rs->cTime));
+                if($rs->mTime)
+					$objects[$rs->id]->setModificationTime(new DateTime('@'.$rs->mTime));
+				if($rs->aTime)
+					$objects[$rs->id]->setAccessTime(new DateTime('@'.$rs->aTime));
             }
         } catch (PDOException $e) {
             die(__METHOD__.' : '.$e->getMessage().'<br />');
