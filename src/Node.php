@@ -28,8 +28,8 @@ trait Node
 
     protected function _nodeJsonSerialize(): array
     {
-		return [
-			'user' => $this->getUser()
-		]+$this->_datedJsonSerialize();
+        return [
+            'user' => $this->getUser(),
+        ] + $this->_datedJsonSerialize();
     }
 }

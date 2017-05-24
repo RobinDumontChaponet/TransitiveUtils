@@ -60,7 +60,7 @@ abstract class MediaDAO extends ModelDAO
             while ($rs = $statement->fetch(PDO::FETCH_OBJ)) {
                 $objects[$rs->id] = new Media($rs->type, $rs->mimeType, $rs->extension, $rs->maxSize, $rs->name, $rs->title);
                 $objects[$rs->id]->setId($rs->id);
-			}
+            }
         } catch (PDOException $e) {
             die(__METHOD__.' : '.$e->getMessage().'<br />');
         }
@@ -80,7 +80,7 @@ abstract class MediaDAO extends ModelDAO
             if($rs = $statement->fetch(PDO::FETCH_OBJ)) {
                 $object = new Media($rs->type, $rs->mimeType, $rs->extension, $rs->maxSize, $rs->name, $rs->title);
                 $object->setId($rs->id);
-			}
+            }
         } catch (PDOException $e) {
             die(__METHOD__.' : '.$e->getMessage().'<br />');
         }

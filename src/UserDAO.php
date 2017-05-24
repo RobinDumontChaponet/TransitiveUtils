@@ -13,7 +13,7 @@ class UserDAO extends ModelDAO
     public static function create(&$user)
     {
         try {
-	        self::beginTransaction();
+            self::beginTransaction();
 
             $statement = self::prepare('INSERT INTO '.self::getTableName().' (emailAddress, pseudonym, passwordHash, cTime, mTime, aTime, sessionHash) values (:emailAddress, :pseudonym, :passwordHash, :cTime, :mTime, :aTime, :sessionHash)');
             $statement->bindValue(':emailAddress', $user->getEmailAddress());
@@ -21,8 +21,8 @@ class UserDAO extends ModelDAO
             $statement->bindValue(':passwordHash', $user->getPasswordHash());
 
             $statement->bindValue(':cTime', $user->getCreationTime()->getTimestamp());
-            $statement->bindValue(':mTime', ($user->getModificationTime())?$user->getModificationTime()->getTimestamp():null);
-            $statement->bindValue(':aTime', ($user->getAccessTime())?$user->getAccessTime()->getTimestamp():null);
+            $statement->bindValue(':mTime', ($user->getModificationTime()) ? $user->getModificationTime()->getTimestamp() : null);
+            $statement->bindValue(':aTime', ($user->getAccessTime()) ? $user->getAccessTime()->getTimestamp() : null);
             $statement->bindValue(':sessionHash', $user->getSessionHash());
 
             $statement->execute();
@@ -31,11 +31,11 @@ class UserDAO extends ModelDAO
             foreach($user->getGroups() as $group)
                 self::addInGroup($user, $group);
 
-			self::commit();
+            self::commit();
 
             return $user->getId();
         } catch (PDOException $e) {
-	        self::rollBack();
+            self::rollBack();
             die(__METHOD__.' : '.$e->getMessage().'<br />');
         }
     }
@@ -43,7 +43,7 @@ class UserDAO extends ModelDAO
     public static function update(&$user)
     {
         try {
-	        self::beginTransaction();
+            self::beginTransaction();
 
             $statement = self::prepare('UPDATE '.self::getTableName().' SET emailAddress=:emailAddress, pseudonym=:pseudonym, passwordHash=:passwordHash, cTime=:cTime, mTime=:mTime, aTime=:aTime, sessionHash=:sessionHash WHERE id=:id');
             $statement->bindValue(':id', $user->getId());
@@ -52,8 +52,8 @@ class UserDAO extends ModelDAO
             $statement->bindValue(':passwordHash', $user->getPasswordHash());
 
             $statement->bindValue(':cTime', $user->getCreationTime()->getTimestamp());
-            $statement->bindValue(':mTime', ($user->getModificationTime())?$user->getModificationTime()->getTimestamp():null);
-            $statement->bindValue(':aTime', ($user->getAccessTime())?$user->getAccessTime()->getTimestamp():null);
+            $statement->bindValue(':mTime', ($user->getModificationTime()) ? $user->getModificationTime()->getTimestamp() : null);
+            $statement->bindValue(':aTime', ($user->getAccessTime()) ? $user->getAccessTime()->getTimestamp() : null);
             $statement->bindValue(':sessionHash', $user->getSessionHash());
 
             $statement->execute();
@@ -64,7 +64,7 @@ class UserDAO extends ModelDAO
 
             return self::getInstance()->lastInsertId();
         } catch (PDOException $e) {
-	        self::rollBack();
+            self::rollBack();
             die(__METHOD__.' : '.$e->getMessage().'<br />');
         }
     }
@@ -82,11 +82,11 @@ class UserDAO extends ModelDAO
                 $objects[$rs->id] = new User($rs->emailAddress, $rs->pseudonym);
                 $objects[$rs->id]->setId($rs->id);
 
-				$objects[$rs->id]->setCreationTime(new DateTime('@'.$rs->cTime));
+                $objects[$rs->id]->setCreationTime(new DateTime('@'.$rs->cTime));
                 if($rs->mTime)
-					$objects[$rs->id]->setModificationTime(new DateTime('@'.$rs->mTime));
-				if($rs->aTime)
-					$objects[$rs->id]->setAccessTime(new DateTime('@'.$rs->aTime));
+                    $objects[$rs->id]->setModificationTime(new DateTime('@'.$rs->mTime));
+                if($rs->aTime)
+                    $objects[$rs->id]->setAccessTime(new DateTime('@'.$rs->aTime));
             }
         } catch (PDOException $e) {
             die(__METHOD__.' : '.$e->getMessage().'<br />');
@@ -111,9 +111,9 @@ class UserDAO extends ModelDAO
 
                 $object->setCreationTime(new DateTime('@'.$rs->cTime));
                 if($rs->mTime)
-	                $object->setModificationTime(new DateTime('@'.$rs->mTime));
-				if($rs->aTime)
-	                $object->setAccessTime(new DateTime('@'.$rs->aTime));
+                    $object->setModificationTime(new DateTime('@'.$rs->mTime));
+                if($rs->aTime)
+                    $object->setAccessTime(new DateTime('@'.$rs->aTime));
             }
         } catch (PDOException $e) {
             die(__METHOD__.' : '.$e->getMessage().'<br />');
@@ -138,9 +138,9 @@ class UserDAO extends ModelDAO
 
                 $object->setCreationTime(new DateTime('@'.$rs->cTime));
                 if($rs->mTime)
-	                $object->setModificationTime(new DateTime('@'.$rs->mTime));
-	            if($rs->aTime)
-	                $object->setAccessTime(new DateTime('@'.$rs->aTime));
+                    $object->setModificationTime(new DateTime('@'.$rs->mTime));
+                if($rs->aTime)
+                    $object->setAccessTime(new DateTime('@'.$rs->aTime));
             }
         } catch (PDOException $e) {
             die(__METHOD__.' : '.$e->getMessage().'<br />');
@@ -186,16 +186,16 @@ class UserDAO extends ModelDAO
     }
 
     public static function search(string $pseudonym, int $limit = null, int $offset = null): array
-	{
-		$objects = array();
+    {
+        $objects = array();
 
         try {
-            $statement = self::prepare('SELECT * FROM '.self::getTableName().' WHERE pseudonym LIKE :pseudonym'. (($limit)?' LIMIT :limit':'').(($offset)?' OFFSET :offset':''));
+            $statement = self::prepare('SELECT * FROM '.self::getTableName().' WHERE pseudonym LIKE :pseudonym'.(($limit) ? ' LIMIT :limit' : '').(($offset) ? ' OFFSET :offset' : ''));
             $statement->bindValue(':pseudonym', '%'.$pseudonym.'%');
             if($limit)
-				$statement->bindParam(':limit', $limit, PDO::PARAM_INT);
-			if($offset)
-	            $statement->bindParam(':offset', $offset, PDO::PARAM_INT);
+                $statement->bindParam(':limit', $limit, PDO::PARAM_INT);
+            if($offset)
+                $statement->bindParam(':offset', $offset, PDO::PARAM_INT);
 
             $statement->execute();
 
@@ -208,5 +208,5 @@ class UserDAO extends ModelDAO
         }
 
         return $objects;
-	}
+    }
 }

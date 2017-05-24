@@ -4,9 +4,9 @@ namespace Transitive\Utils;
 
 class Media extends Model implements \JsonSerializable
 {
-	use Named;
+    use Named;
 
-	public static $path = 'data/media';
+    public static $path = 'data/media';
 
     private static $types = ['image', 'sound', 'video'];
     private static $sizes = ['small', 'medium', 'large'];
@@ -32,20 +32,20 @@ class Media extends Model implements \JsonSerializable
 
     public static function editable(Media $media = null, string $name = null): string
     {
-	    if(empty($media))
-			$media = new Media();
+        if(empty($media))
+            $media = new self();
 
-		$str = '<figure class="media auto-init" title="'.($media->getTitle() ?? 'Ajouter un média').'">';
-		$str.= '<label for="mediaInput'.self::$editableId.'">Téléverser</label>';
-		$str.= '<input type="file" id="mediaInput'.self::$editableId.'" name="mediaUpload" />';
-		$str.= '<input type="hidden" name="'.($name ?? 'media'.self::$editableId).'" disabled="disabled" />';
-	    if($media->id > 0)
-			$str.= '<img src="'.self::$path.'/'.$media->getMaxSize().'/'.$media->getId().'.'.$media->getExtension().'" alt="" />';
-		$str.= '<figcaption>'.($media->getName() ?? '').'</figcaption>';
-		$str.= '</figure>';
-		self::$editableId++;
+        $str = '<figure class="media auto-init" title="'.($media->getTitle() ?? 'Ajouter un média').'">';
+        $str .= '<label for="mediaInput'.self::$editableId.'">Téléverser</label>';
+        $str .= '<input type="file" id="mediaInput'.self::$editableId.'" name="mediaUpload" />';
+        $str .= '<input type="hidden" name="'.($name ?? 'media'.self::$editableId).'" disabled="disabled" />';
+        if($media->id > 0)
+            $str .= '<img src="'.self::$path.'/'.$media->getMaxSize().'/'.$media->getId().'.'.$media->getExtension().'" alt="" />';
+        $str .= '<figcaption>'.($media->getName() ?? '').'</figcaption>';
+        $str .= '</figure>';
+        ++self::$editableId;
 
-		return $str;
+        return $str;
     }
 
     public function __construct($type = 'image', $mimeType = 'image/jpeg', $extension = 'jpg', $maxSize = 'small', $name = null, $title = null)
@@ -106,23 +106,23 @@ class Media extends Model implements \JsonSerializable
 
     public function __toString()
     {
-	    $str = '<figure title="'.$this->getTitle().'">';
-	    if($this->id > 0)
-			$str.= '<img src="'.self::$path.'/'.$this->getMaxSize().'/'.$this->getId().'.'.$this->getExtension().'" alt="" />';
-		$str.= '<figcaption>'.$this->getName().'</figcaption>';
-		$str.= '</figure>';
+        $str = '<figure title="'.$this->getTitle().'">';
+        if($this->id > 0)
+            $str .= '<img src="'.self::$path.'/'.$this->getMaxSize().'/'.$this->getId().'.'.$this->getExtension().'" alt="" />';
+        $str .= '<figcaption>'.$this->getName().'</figcaption>';
+        $str .= '</figure>';
 
-		return $str;
+        return $str;
     }
 
     public function jsonSerialize()
     {
-        return parent::jsonSerialize()+[
+        return parent::jsonSerialize() + [
             'type' => htmlentities($this->getType()),
             'mime' => htmlentities($this->getMimeType()),
             'extension' => htmlentities($this->getExtension()),
             'maxSize' => htmlentities($this->getMaxSize()),
-            'path' => htmlentities(self::$path)
-        ]+$this->_namedJsonSerialize();
+            'path' => htmlentities(self::$path),
+        ] + $this->_namedJsonSerialize();
     }
 }

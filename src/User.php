@@ -6,14 +6,14 @@ use DateTime;
 
 class User extends Model implements \JsonSerializable
 {
-	use Dated;
+    use Dated;
 
     /**
      * @var string
      */
     private $emailAddress;
 
-	/**
+    /**
      * @var string
      */
     private $pseudonym;
@@ -187,10 +187,10 @@ class User extends Model implements \JsonSerializable
 
     public function jsonSerialize()
     {
-		return parent::jsonSerialize()
-		+[
-			'pseudonyme' => htmlentities($this->getPseudonym()),
-			'groups' => $this->getGroups()
-		];
+        return parent::jsonSerialize()
+        + [
+            'pseudonyme' => htmlentities($this->getPseudonym()),
+            'groups' => $this->getGroups(),
+        ];
     }
 }

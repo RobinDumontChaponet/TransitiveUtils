@@ -29,7 +29,7 @@ abstract class Model implements \JsonSerializable
     public function jsonSerialize()
     {
         return [
-            'id' => $this->getId()
+            'id' => $this->getId(),
         ];
     }
 }

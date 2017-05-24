@@ -64,12 +64,12 @@ trait Named
 
     protected function _namedJsonSerialize(): array
     {
-		$array = [
-			'name' => htmlentities($this->getName()),
-		];
-		if(isset($this->title))
-			$array['title'] = htmlentities($this->getTitle());
+        $array = [
+            'name' => htmlentities($this->getName()),
+        ];
+        if(isset($this->title))
+            $array['title'] = htmlentities($this->getTitle());
 
-		return $array;
+        return $array;
     }
 }

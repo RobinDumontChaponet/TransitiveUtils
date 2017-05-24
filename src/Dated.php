@@ -1,8 +1,8 @@
 <?php
 
-
 namespace Transitive\Utils;
-use \Datetime;
+
+use Datetime;
 
 trait Dated
 {
@@ -59,10 +59,10 @@ trait Dated
 
     protected function _datedJsonSerialize(): array
     {
-		return [
-			'cTime' => $this->getCreationTime()->getTimestamp(),
-			'mTime' => ($this->getModificationTime())?$this->getModificationTime()->getTimestamp():null,
-			'aTime' => ($this->getAccessTime())?$this->getAccessTime()->getTimestamp():null
-		];
+        return [
+            'cTime' => $this->getCreationTime()->getTimestamp(),
+            'mTime' => ($this->getModificationTime()) ? $this->getModificationTime()->getTimestamp() : null,
+            'aTime' => ($this->getAccessTime()) ? $this->getAccessTime()->getTimestamp() : null,
+        ];
     }
 }

@@ -25,7 +25,7 @@ class Group extends Model implements \JsonSerializable
 
     public function jsonSerialize()
     {
-		return parent::jsonSerialize()
-		+$this->_namedJsonSerialize();
+        return parent::jsonSerialize()
+        + $this->_namedJsonSerialize();
     }
 }

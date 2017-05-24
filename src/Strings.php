@@ -129,69 +129,69 @@ abstract class Strings
     }
 
     //http://php.net/manual/fr/dateinterval.format.php#96768
-	public static function formatDateDiff(DateTime $start, $end = null): string
-	{
-	    if(!($start instanceof DateTime)) {
-	        $start = new DateTime($start);
-	    }
+    public static function formatDateDiff(DateTime $start, $end = null): string
+    {
+        if(!($start instanceof DateTime)) {
+            $start = new DateTime($start);
+        }
 
-	    if($end === null) {
-	        $end = new DateTime();
-	    }
-	    if(!($end instanceof DateTime)) {
-	        $end = new DateTime($start);
-	    }
+        if($end === null) {
+            $end = new DateTime();
+        }
+        if(!($end instanceof DateTime)) {
+            $end = new DateTime($start);
+        }
 
-	    $interval = $end->diff($start);
-	    $doPlural = function($nb,$str){return $nb>1?$str.'s':$str;}; // adds plurals
+        $interval = $end->diff($start);
+        $doPlural = function ($nb, $str) {return $nb > 1 ? $str.'s' : $str; }; // adds plurals
 
-	    $format = array();
-	    if($interval->y !== 0) {
-	        $format[] = '%y '.$doPlural($interval->y, 'an');
-	    }
-	    if($interval->m !== 0) {
-	        $format[] = '%m mois';
-	    }
-	    if($interval->d !== 0) {
-	        $format[] = '%d '.$doPlural($interval->d, 'jour');
-	    }
-	    if($interval->h !== 0) {
-	        $format[] = '%h '.$doPlural($interval->h, 'heure');
-	    }
-	    if($interval->i !== 0) {
-	        $format[] = '%i '.$doPlural($interval->i, 'minute');
-	    }
-	    if($interval->s !== 0) {
-	        if(!count($format)) {
-	            return 'Il y a moins d\'une minute';
-	        } else {
-	            $format[] = '%s '.$doPlural($interval->s, 'seconde');
-	        }
-	    }
+        $format = array();
+        if($interval->y !== 0) {
+            $format[] = '%y '.$doPlural($interval->y, 'an');
+        }
+        if($interval->m !== 0) {
+            $format[] = '%m mois';
+        }
+        if($interval->d !== 0) {
+            $format[] = '%d '.$doPlural($interval->d, 'jour');
+        }
+        if($interval->h !== 0) {
+            $format[] = '%h '.$doPlural($interval->h, 'heure');
+        }
+        if($interval->i !== 0) {
+            $format[] = '%i '.$doPlural($interval->i, 'minute');
+        }
+        if($interval->s !== 0) {
+            if(!count($format)) {
+                return 'Il y a moins d\'une minute';
+            } else {
+                $format[] = '%s '.$doPlural($interval->s, 'seconde');
+            }
+        }
 
-	    // We use the two biggest parts
-	    if(count($format) > 1)
-	        $format = array_shift($format).' et '.array_shift($format);
-		else
-	        $format = array_pop($format);
+        // We use the two biggest parts
+        if(count($format) > 1)
+            $format = array_shift($format).' et '.array_shift($format);
+        else
+            $format = array_pop($format);
 
-	    return 'Il y a '.$interval->format($format);
-	}
+        return 'Il y a '.$interval->format($format);
+    }
 
-	public static function hex2rgb($hex) {
-		$hex = str_replace('#', '', $hex);
+    public static function hex2rgb($hex) {
+        $hex = str_replace('#', '', $hex);
 
-		if(strlen($hex) == 3) {
-			$r = hexdec(substr($hex,0,1).substr($hex,0,1));
-			$g = hexdec(substr($hex,1,1).substr($hex,1,1));
-			$b = hexdec(substr($hex,2,1).substr($hex,2,1));
-		} else {
-			$r = hexdec(substr($hex,0,2));
-			$g = hexdec(substr($hex,2,2));
-			$b = hexdec(substr($hex,4,2));
-		}
-		$rgb = array($r, $g, $b);
-		//return implode(",", $rgb); // returns the rgb values separated by commas
-		return $rgb; // returns an array with the rgb values
-	}
+        if(strlen($hex) == 3) {
+            $r = hexdec(substr($hex, 0, 1).substr($hex, 0, 1));
+            $g = hexdec(substr($hex, 1, 1).substr($hex, 1, 1));
+            $b = hexdec(substr($hex, 2, 1).substr($hex, 2, 1));
+        } else {
+            $r = hexdec(substr($hex, 0, 2));
+            $g = hexdec(substr($hex, 2, 2));
+            $b = hexdec(substr($hex, 4, 2));
+        }
+        $rgb = array($r, $g, $b);
+        //return implode(",", $rgb); // returns the rgb values separated by commas
+        return $rgb; // returns an array with the rgb values
+    }
 }
