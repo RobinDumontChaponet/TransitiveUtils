@@ -48,7 +48,7 @@ class Database
     {
         if (!isset(self::$PDOInstances[$this->dbType.':'.$this->dbName.','.$this->dbUser])) {
             try {
-                self::$PDOInstances[$this->dbType.':'.$this->dbName.','.$this->dbUser] = new PDO(
+                $pdo = new PDO(
                     $this->dbType.':host='.$this->dbHost.';port='.$this->dbPort.';dbname='.$this->dbName,
                     $this->dbUser,
                     $this->dbPwd,
@@ -58,6 +58,11 @@ class Database
                         PDO::ATTR_PERSISTENT => true,
                     )
                 );
+
+                // Set prepared statement emulation depending on server version - thx to https://stackoverflow.com/a/10455228
+                $pdo->setAttribute(PDO::ATTR_EMULATE_PREPARES, version_compare($pdo->getAttribute(PDO::ATTR_SERVER_VERSION), '5.1.17', '<'));
+
+                self::$PDOInstances[$this->dbType.':'.$this->dbName.','.$this->dbUser] = $pdo;
             } catch (PDOException $e) {
                 echo '<b>Error '.__METHOD__.' </b> '.$e->getMessage().'<br />'.PHP_EOL;
             }
