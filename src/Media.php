@@ -35,7 +35,7 @@ class Media extends Model implements \JsonSerializable
         if(empty($media))
             $media = new self();
 
-        $str = '<figure class="media auto-init" title="'.($media->getTitle() ?? 'Ajouter un média').'">';
+        $str = '<figure class="media editable auto-init" title="'.($media->getTitle() ?? 'Ajouter un média').'">';
         $str .= '<label for="mediaInput'.self::$editableId.'">Téléverser</label>';
         $str .= '<input type="file" id="mediaInput'.self::$editableId.'" name="mediaUpload" />';
         $str .= '<input type="hidden" name="'.($name ?? 'media'.self::$editableId).'" disabled="disabled" />';
@@ -104,13 +104,31 @@ class Media extends Model implements \JsonSerializable
         $this->maxSize = $maxSize;
     }
 
+    public function setName(string $name): void
+    {
+        $name = trim($name);
+
+        if(strlen($name) > 40)
+            throw new ModelException('Le nom doit être au maximum de 40 caractères.', null, $e);
+
+        $this->name = $name;
+    }
+
+	public function asImgElement(): string
+    {
+        $str = '';
+        if($this->id > 0)
+            $str .= '<img src="'.self::$path.'/'.$this->getMaxSize().'/'.$this->getId().'.'.$this->getExtension().'" alt="" />';
+
+        return $str;
+    }
+
     public function __toString()
     {
         $str = '<figure title="'.$this->getTitle().'">';
-        if($this->id > 0)
-            $str .= '<img src="'.self::$path.'/'.$this->getMaxSize().'/'.$this->getId().'.'.$this->getExtension().'" alt="" />';
-        $str .= '<figcaption>'.$this->getName().'</figcaption>';
-        $str .= '</figure>';
+        $str.= $this->asImgElement();
+        $str.= '<figcaption>'.$this->getName().'</figcaption>';
+        $str.= '</figure>';
 
         return $str;
     }
@@ -124,5 +142,13 @@ class Media extends Model implements \JsonSerializable
             'maxSize' => htmlentities($this->getMaxSize()),
             'path' => htmlentities(self::$path),
         ] + $this->_namedJsonSerialize();
+    }
+
+    public static function ImgElement(?Media $media = null): string
+    {
+	    if($media)
+		    return $media->asImgElement();
+
+		return '';
     }
 }
