@@ -125,7 +125,7 @@ class Media extends Model implements \JsonSerializable
 
     public function __toString()
     {
-        $str = '<figure title="'.$this->getTitle().'">';
+        $str = '<figure title="'.$this->getTitle().'" class="media">';
         $str.= $this->asImgElement();
         $str.= '<figcaption>'.$this->getName().'</figcaption>';
         $str.= '</figure>';

@@ -55,9 +55,10 @@ class Database
                     array(
                         PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES utf8',
                         PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-                        PDO::ATTR_PERSISTENT => true,
+                        PDO::ATTR_PERSISTENT => false
                     )
                 );
+				$pdo->setAttribute(PDO::ATTR_STATEMENT_CLASS, array('Transitive\Utils\Statement', array($pdo)));
 
                 // Set prepared statement emulation depending on server version - thx to https://stackoverflow.com/a/10455228
                 $pdo->setAttribute(PDO::ATTR_EMULATE_PREPARES, version_compare($pdo->getAttribute(PDO::ATTR_SERVER_VERSION), '5.1.17', '<'));
