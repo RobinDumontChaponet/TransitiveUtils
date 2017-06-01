@@ -24,6 +24,12 @@ class Statement extends PDOStatement {
 			$this->o = $this->pdo->prepare($this->getQuery());
 		}
 
+/*
+		file_put_contents(LOG.'queries.log', $this->getQuery().PHP_EOL, FILE_APPEND);
+		if(!empty($this->parameters))
+			file_put_contents(LOG.'queries.log', json_encode($this->parameters).PHP_EOL, FILE_APPEND);
+*/
+
 		if(empty($inputParameters)) {
 			if($this->o) {
 				foreach($this->parameters as $parameter => $value)
@@ -46,7 +52,7 @@ class Statement extends PDOStatement {
 	public function bindClause(string $parameter, $value, string $sql)
 	{
 		$this->parameters[$parameter] = $value;
-		$this->where.= ' ' . ((!empty($this->where))?'OAAR ':'') . $sql;
+		$this->where.= ' ' . ((!empty($this->where))?'OR ':'') . $sql;
 	}
 
 	public function getStatement()
