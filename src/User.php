@@ -35,7 +35,7 @@ class User extends Model implements \JsonSerializable
 
     private const HASH_COST = 12;
 
-    public function __construct(string $emailAddress, string $pseudonym, string $passwordHash = null, array $groups = array())
+    public function __construct(string $emailAddress, string $pseudonym, string $passwordHash = '', array $groups = array())
     {
         parent::__construct();
         $this->_initDated();
@@ -44,10 +44,7 @@ class User extends Model implements \JsonSerializable
 
         $this->pseudonym = $pseudonym;
 
-        if(isset($passwordHash))
-            $this->setPasswordHash($passwordHash);
-        else
-            $this->setPassword(Strings::random());
+		$this->setPasswordHash($passwordHash);
 
         $this->sessionHash = '';
         $this->groups = $groups;

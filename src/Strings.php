@@ -194,4 +194,8 @@ abstract class Strings
         //return implode(",", $rgb); // returns the rgb values separated by commas
         return $rgb; // returns an array with the rgb values
     }
+
+    public static function pluralize($value, $text) {
+		return $value . ' ' . $text . (($value > 1)?'s':'');
+	}
 }

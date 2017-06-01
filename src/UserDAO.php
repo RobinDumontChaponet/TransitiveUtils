@@ -185,28 +185,33 @@ class UserDAO extends ModelDAO
             self::addInGroup($user, $added);
     }
 
-    public static function search(string $pseudonym, int $limit = null, int $offset = null): array
-    {
-        $objects = array();
+    public static function search(array $on, int $limit = null, int $offset = null): array
+	{
+		$objects = array();
+		$params = array();
 
         try {
-            $statement = self::prepare('SELECT * FROM '.self::getTableName().' WHERE pseudonym LIKE :pseudonym'.(($limit) ? ' LIMIT :limit' : '').(($offset) ? ' OFFSET :offset' : ''));
-            $statement->bindValue(':pseudonym', '%'.$pseudonym.'%');
+            $statement = self::prepare('SELECT * FROM '.self::getTableName(). (($limit)?' LIMIT :limit':'').(($offset)?' OFFSET :offset':''));
+
+			$statement->autoBindClause(':pseudonym', @$on['pseudonym'], 'pseudonym LIKE :pseudonym', '%', '%');
+
+			$statement->autoBindClause(':emailAddress', @$on['emailAddress'], 'emailAddress LIKE :emailAddress');
+
             if($limit)
-                $statement->bindParam(':limit', $limit, PDO::PARAM_INT);
-            if($offset)
-                $statement->bindParam(':offset', $offset, PDO::PARAM_INT);
+				$params[':limit'] = $limit;
+			if($offset)
+	            $params[':offset'] = $offset;
 
-            $statement->execute();
+			$statement->execute();
 
-            while ($rs = $statement->fetch(PDO::FETCH_OBJ)) {
-                $objects[$rs->id] = new User($rs->emailAddress, $pseudonym);
+            while ($rs = $statement->getStatement()->fetch(PDO::FETCH_OBJ)) {
+                $objects[$rs->id] = new User($rs->emailAddress, $rs->pseudonym);
                 $objects[$rs->id]->setId($rs->id);
             }
         } catch (PDOException $e) {
-            throw new DAOException($e->getMessage());
+            throw new DAOException($e);
         }
 
         return $objects;
-    }
+	}
 }
