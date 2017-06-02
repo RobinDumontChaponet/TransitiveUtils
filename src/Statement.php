@@ -10,53 +10,97 @@ class Statement extends PDOStatement {
 
     private $where = '';
     private $parameters = array();
+    private $limit = '';
+    private $offset = '';
 
     private $o;
+
+    private $index = 0;
 
     protected function __construct(PDO $pdo)
     {
         $this->pdo = $pdo;
+        $this->o = null;
     }
 
 	public function execute($inputParameters = null)
 	{
-		if(!empty($this->where) && !empty($this->queryString)) {
+		if(!$this->o && (!empty($this->where) || !empty($this->limit) || !empty($this->offset)) && !empty($this->queryString))
 			$this->o = $this->pdo->prepare($this->getQuery());
-		}
 
-/*
-		file_put_contents(LOG.'queries.log', $this->getQuery().PHP_EOL, FILE_APPEND);
-		if(!empty($this->parameters))
-			file_put_contents(LOG.'queries.log', json_encode($this->parameters).PHP_EOL, FILE_APPEND);
-*/
+		if(!$this->o) {
+			file_put_contents(LOG.'queries.log', $this->getQuery().PHP_EOL, FILE_APPEND);
+			if(!empty($this->parameters))
+				file_put_contents(LOG.'queries.log', json_encode($this->parameters).PHP_EOL, FILE_APPEND);
+		}
 
 		if(empty($inputParameters)) {
 			if($this->o) {
 				foreach($this->parameters as $parameter => $value)
 					$this->o->bindValue($parameter, $value);
 
-				$this->o->execute();
+				return $this->o->execute();
 			} else
-				parent::execute();
+				return parent::execute();
 		} else
 			if($this->o)
-				$this->o->execute($inputParameters+$this->parameters);
+				return $this->o->execute($inputParameters+$this->parameters);
 			else
-				parent::execute($inputParameters+$this->parameters);
+				return parent::execute($inputParameters+$this->parameters);
 	}
 
 	public function getQuery() {
-		return $this->queryString . ((!empty($this->where) && !empty($this->queryString))? ' WHERE'.$this->where : '');
+		return $this->queryString
+				.((!empty($this->where)  && !empty($this->queryString))? ' WHERE'.$this->where : '')
+				.((!empty($this->limit)  && !empty($this->queryString))? ' '.$this->limit : '')
+				.((!empty($this->offset) && !empty($this->queryString))? ' '.$this->offset : '');
 	}
 
-	public function bindClause(string $parameter, $value, string $sql)
+	public function autoBindClause(string $parameter, $value, string $sql, string $prefix = null, string $suffix = null)
 	{
-		$this->parameters[$parameter] = $value;
-		$this->where.= ' ' . ((!empty($this->where))?'OR ':'') . $sql;
+		if(!empty($value))
+			$this->bindClause($parameter, $value, $sql, $prefix, $suffix);
+
+		return false;
+	}
+
+	public function bindClause(string $parameter, $value, string $sql, string $prefix = null, string $suffix = null)
+	{
+		if(is_array($value))
+			foreach($value as $key => $item) {
+				if(!is_scalar($item))
+					$item = $key;
+
+				$this->_bindClause($parameter, $item, $sql, $prefix, $suffix);
+			}
+		else
+			$this->_bindClause($parameter, $value, $sql, $prefix, $suffix);
+	}
+
+	private function _bindClause(string $parameter, $value, string $sql, string $prefix = null, string $suffix = null)
+	{
+		$this->parameters[$parameter.'_'.$this->index] = $prefix.$value.$suffix;
+		$this->where.= ' ' . ((!empty($this->where))?'OR ':'') . '('.$sql .'_'.$this->index++.')';
 	}
 
 	public function getStatement()
 	{
 		return $this->o ?? $this;
+	}
+
+	public function setLimit(int $limit = null)
+	{
+		if($limit) {
+			$this->limit = ($limit)?'LIMIT :limit' : '';
+			$this->parameters[':limit'] = $limit;
+		}
+	}
+
+	public function setOffset(int $offset = null)
+	{
+		if($offset) {
+			$this->offset = ($offset)?'OFFSET :offset' : '';
+			$this->parameters[':offset'] = $offset;
+		}
 	}
 }
