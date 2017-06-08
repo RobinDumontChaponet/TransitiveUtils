@@ -185,17 +185,21 @@ class UserDAO extends ModelDAO
             self::addInGroup($user, $added);
     }
 
-    public static function search(array $on, int $limit = null, int $offset = null): array
+    public static function search(array $on, string $combinator = 'OR', int $limit = null, int $offset = null): array
 	{
 		$objects = array();
 		$params = array();
 
         try {
-            $statement = self::prepare('SELECT * FROM '.self::getTableName(). (($limit)?' LIMIT :limit':'').(($offset)?' OFFSET :offset':''));
+            $statement = self::prepare('SELECT * FROM '.self::getTableName());
+            $statement->setLimit($limit);
+            $statement->setOffset($offset);
 
-			$statement->autoBindClause(':pseudonym', @$on['pseudonym'], 'pseudonym LIKE :pseudonym', '%', '%');
+            $statement->setCombinator($combinator);
 
-			$statement->autoBindClause(':emailAddress', @$on['emailAddress'], 'emailAddress LIKE :emailAddress');
+			$statement->autoBindClause(':pseudonym', @$on['pseudonym'], 'pseudonym LIKE :pseudonym', '', '%');
+
+			$statement->autoBindClause(':emailAddress', @$on['emailAddress'], 'emailAddress LIKE :emailAddress', '', '%');
 
             if($limit)
 				$params[':limit'] = $limit;
