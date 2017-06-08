@@ -17,6 +17,8 @@ class Statement extends PDOStatement {
 
     private $index = 0;
 
+    private $combinator = 'OR';
+
     protected function __construct(PDO $pdo)
     {
         $this->pdo = $pdo;
@@ -28,11 +30,13 @@ class Statement extends PDOStatement {
 		if(!$this->o && (!empty($this->where) || !empty($this->limit) || !empty($this->offset)) && !empty($this->queryString))
 			$this->o = $this->pdo->prepare($this->getQuery());
 
+/*
 		if(!$this->o) {
 			file_put_contents(LOG.'queries.log', $this->getQuery().PHP_EOL, FILE_APPEND);
 			if(!empty($this->parameters))
 				file_put_contents(LOG.'queries.log', json_encode($this->parameters).PHP_EOL, FILE_APPEND);
 		}
+*/
 
 		if(empty($inputParameters)) {
 			if($this->o) {
@@ -56,31 +60,40 @@ class Statement extends PDOStatement {
 				.((!empty($this->offset) && !empty($this->queryString))? ' '.$this->offset : '');
 	}
 
-	public function autoBindClause(string $parameter, $value, string $sql, string $prefix = null, string $suffix = null)
+	public function autoBindClause(string $parameter, $value, string $sql, string $prefix = null, string $suffix = null, string $combinator = null)
 	{
+		if(!isset($combinator))
+			$combinator = $this->combinator;
+
 		if(!empty($value))
-			$this->bindClause($parameter, $value, $sql, $prefix, $suffix);
+			$this->bindClause($parameter, $value, $sql, $prefix, $suffix, $combinator);
 
 		return false;
 	}
 
-	public function bindClause(string $parameter, $value, string $sql, string $prefix = null, string $suffix = null)
+	public function bindClause(string $parameter, $value, string $sql, string $prefix = null, string $suffix = null, string $combinator = null)
 	{
+		if(!isset($combinator))
+			$combinator = $this->combinator;
+
 		if(is_array($value))
 			foreach($value as $key => $item) {
 				if(!is_scalar($item))
 					$item = $key;
 
-				$this->_bindClause($parameter, $item, $sql, $prefix, $suffix);
+				$this->_bindClause($parameter, $item, $sql, $prefix, $suffix, $combinator);
 			}
 		else
-			$this->_bindClause($parameter, $value, $sql, $prefix, $suffix);
+			$this->_bindClause($parameter, $value, $sql, $prefix, $suffix, $combinator);
 	}
 
-	private function _bindClause(string $parameter, $value, string $sql, string $prefix = null, string $suffix = null)
+	private function _bindClause(string $parameter, $value, string $sql, string $prefix = null, string $suffix = null, string $combinator = null)
 	{
+		if(!isset($combinator))
+			$combinator = $this->combinator;
+
 		$this->parameters[$parameter.'_'.$this->index] = $prefix.$value.$suffix;
-		$this->where.= ' ' . ((!empty($this->where))?'OR ':'') . '('.$sql .'_'.$this->index++.')';
+		$this->where.= ' ' . ((!empty($this->where))?$combinator.' ':'') . '('.$sql .'_'.$this->index++.')';
 	}
 
 	public function getStatement()
@@ -102,5 +115,20 @@ class Statement extends PDOStatement {
 			$this->offset = ($offset)?'OFFSET :offset' : '';
 			$this->parameters[':offset'] = $offset;
 		}
+	}
+
+	public function appendSQL(string $sql)
+	{
+		$this->where.= ' ' .$sql;
+	}
+
+	public function addParam(string $key, $value)
+	{
+		$this->parameters[$key] = $value;
+	}
+
+	public function setCombinator(string $combinator = 'OR')
+	{
+		$this->combinator = $combinator;
 	}
 }
