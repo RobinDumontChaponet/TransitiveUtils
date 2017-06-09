@@ -12,6 +12,7 @@ class Statement extends PDOStatement {
     private $parameters = array();
     private $limit = '';
     private $offset = '';
+    private $orderBy = '';
 
     private $o;
 
@@ -57,7 +58,8 @@ class Statement extends PDOStatement {
 		return $this->queryString
 				.((!empty($this->where)  && !empty($this->queryString))? ' WHERE'.$this->where : '')
 				.((!empty($this->limit)  && !empty($this->queryString))? ' '.$this->limit : '')
-				.((!empty($this->offset) && !empty($this->queryString))? ' '.$this->offset : '');
+				.((!empty($this->offset) && !empty($this->queryString))? ' '.$this->offset : '')
+				.((!empty($this->orderBy) && !empty($this->queryString))? ' '.$this->orderBy : '');
 	}
 
 	public function autoBindClause(string $parameter, $value, string $sql, string $prefix = null, string $suffix = null, string $combinator = null)
@@ -104,17 +106,30 @@ class Statement extends PDOStatement {
 	public function setLimit(int $limit = null)
 	{
 		if($limit) {
-			$this->limit = ($limit)?'LIMIT :limit' : '';
+			$this->limit = 'LIMIT :limit';
 			$this->parameters[':limit'] = $limit;
-		}
+		} else
+			$this->limit = '';
 	}
-
 	public function setOffset(int $offset = null)
 	{
 		if($offset) {
 			$this->offset = ($offset)?'OFFSET :offset' : '';
 			$this->parameters[':offset'] = $offset;
-		}
+		} else
+			$this->offset = '';
+	}
+
+	public function orderBy(string $column = null, string $direction = null)
+	{
+		if($column) {
+			$column = htmlspecialchars(htmlentities(strip_tags(addcslashes($column, '%_')), ENT_NOQUOTES, 'UTF-8'));
+
+			$this->orderBy = 'ORDER BY '.$column;
+			if(isset($direction))
+				$this->orderBy.= (strtolower($direction)=='desc')?' DESC':' ASC';
+		} else
+			$this->orderBy = '';
 	}
 
 	public function appendSQL(string $sql)
