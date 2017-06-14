@@ -33,6 +33,11 @@ class User extends Model implements \JsonSerializable
      */
     private $groups;
 
+    /**
+	 * @var bool
+	 */
+    private $verified = false;
+
     private const HASH_COST = 12;
 
     public function __construct(string $emailAddress, string $pseudonym, string $passwordHash = '', array $groups = array())
@@ -163,6 +168,20 @@ class User extends Model implements \JsonSerializable
         $this->pseudonym = $pseudonym;
     }
 
+    public function createConfirmation(): string
+    {
+		return md5(rand(0,1000));
+    }
+
+    public function setVerified(bool $verified = true): void
+    {
+	    $this->verified = $verified;
+    }
+    public function isVerified(): bool
+    {
+	    return $this->verified;
+    }
+
     public function __toString(): string
     {
         $str = '<address class="user webspace">';
@@ -178,8 +197,6 @@ class User extends Model implements \JsonSerializable
 
         $this->aTime = new DateTime();
         $this->sessionHash = Sessions::getId();
-
-        UserDAO::update($this);
     }
 
     public function jsonSerialize()

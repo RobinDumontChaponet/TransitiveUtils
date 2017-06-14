@@ -15,7 +15,7 @@ class UserDAO extends ModelDAO
         try {
             self::beginTransaction();
 
-            $statement = self::prepare('INSERT INTO '.self::getTableName().' (emailAddress, pseudonym, passwordHash, cTime, mTime, aTime, sessionHash) values (:emailAddress, :pseudonym, :passwordHash, :cTime, :mTime, :aTime, :sessionHash)');
+            $statement = self::prepare('INSERT INTO '.self::getTableName().' (emailAddress, pseudonym, passwordHash, cTime, mTime, aTime, sessionHash, verified) values (:emailAddress, :pseudonym, :passwordHash, :cTime, :mTime, :aTime, :sessionHash, :verified)');
             $statement->bindValue(':emailAddress', $user->getEmailAddress());
             $statement->bindValue(':pseudonym', $user->getPseudonym());
             $statement->bindValue(':passwordHash', $user->getPasswordHash());
@@ -24,9 +24,11 @@ class UserDAO extends ModelDAO
             $statement->bindValue(':mTime', ($user->getModificationTime()) ? $user->getModificationTime()->getTimestamp() : null);
             $statement->bindValue(':aTime', ($user->getAccessTime()) ? $user->getAccessTime()->getTimestamp() : null);
             $statement->bindValue(':sessionHash', $user->getSessionHash());
+//             $statement->bindValue(':verificationHash', $user->getVerificationHash());
+            $statement->bindValue(':verified', (int)$user->isVerified());
 
             $statement->execute();
-            $user->setId(self::getInstance()->lastInsertId());
+            $user->setId(self::lastInsertId());
 
             foreach($user->getGroups() as $group)
                 self::addInGroup($user, $group);
@@ -36,7 +38,7 @@ class UserDAO extends ModelDAO
             return $user->getId();
         } catch (PDOException $e) {
             self::rollBack();
-            die(__METHOD__.' : '.$e->getMessage().'<br />');
+            throw new DAOException($e);
         }
     }
 
@@ -45,7 +47,7 @@ class UserDAO extends ModelDAO
         try {
             self::beginTransaction();
 
-            $statement = self::prepare('UPDATE '.self::getTableName().' SET emailAddress=:emailAddress, pseudonym=:pseudonym, passwordHash=:passwordHash, cTime=:cTime, mTime=:mTime, aTime=:aTime, sessionHash=:sessionHash WHERE id=:id');
+            $statement = self::prepare('UPDATE '.self::getTableName().' SET emailAddress=:emailAddress, pseudonym=:pseudonym, passwordHash=:passwordHash, cTime=:cTime, mTime=:mTime, aTime=:aTime, sessionHash=:sessionHash, verified=:verified WHERE id=:id');
             $statement->bindValue(':id', $user->getId());
             $statement->bindValue(':emailAddress', $user->getEmailAddress());
             $statement->bindValue(':pseudonym', $user->getPseudonym());
@@ -55,6 +57,8 @@ class UserDAO extends ModelDAO
             $statement->bindValue(':mTime', ($user->getModificationTime()) ? $user->getModificationTime()->getTimestamp() : null);
             $statement->bindValue(':aTime', ($user->getAccessTime()) ? $user->getAccessTime()->getTimestamp() : null);
             $statement->bindValue(':sessionHash', $user->getSessionHash());
+//             $statement->bindValue(':verificationHash', $user->getVerificationHash());
+            $statement->bindValue(':verified', (int)$user->isVerified());
 
             $statement->execute();
 
@@ -62,25 +66,33 @@ class UserDAO extends ModelDAO
 
             self::commit();
 
-            return self::getInstance()->lastInsertId();
+            return $user->getId();
         } catch (PDOException $e) {
             self::rollBack();
-            die(__METHOD__.' : '.$e->getMessage().'<br />');
+            throw new DAOException($e);
         }
     }
 
-    public static function getAll(): array
+    public static function getAll(string $sortBy = null, string $orderBy = null, int $limit = null, int $offset = null): array
     {
         $objects = array();
 
+		if(isset($sortBy) && !in_array($sortBy, ['nodeId', 'name', 'meanScore']))
+			$sortBy = null;
+
         try {
-            $statement = self::prepare('SELECT id, emailAddress, pseudonym, cTime, mTime, aTime FROM '.self::getTableName());
+            $statement = self::prepare('SELECT id, emailAddress, pseudonym, cTime, mTime, aTime, verified FROM '.self::getTableName() . (($sortBy)?(' ORDER BY '.$sortBy. (($orderBy=='desc')?' DESC':' ASC')):'') . (($limit)?' LIMIT :limit':'').(($offset)?' OFFSET :offset':''));
+			if($limit)
+				$statement->bindParam(':limit', $limit, PDO::PARAM_INT);
+			if($offset)
+	            $statement->bindParam(':offset', $offset, PDO::PARAM_INT);
 
             $statement->execute();
 
             while ($rs = $statement->fetch(PDO::FETCH_OBJ)) {
                 $objects[$rs->id] = new User($rs->emailAddress, $rs->pseudonym);
                 $objects[$rs->id]->setId($rs->id);
+                $objects[$rs->id]->setVerified($rs->verified);
 
                 $objects[$rs->id]->setCreationTime(new DateTime('@'.$rs->cTime));
                 if($rs->mTime)
@@ -89,7 +101,7 @@ class UserDAO extends ModelDAO
                     $objects[$rs->id]->setAccessTime(new DateTime('@'.$rs->aTime));
             }
         } catch (PDOException $e) {
-            die(__METHOD__.' : '.$e->getMessage().'<br />');
+            throw new DAOException($e);
         }
 
         return $objects;
@@ -100,7 +112,7 @@ class UserDAO extends ModelDAO
         $object = null;
 
         try {
-            $statement = self::prepare('SELECT emailAddress, pseudonym, passwordHash, cTime, mTime, aTime, sessionHash FROM '.self::getTableName().' WHERE id=:id');
+            $statement = self::prepare('SELECT emailAddress, pseudonym, passwordHash, cTime, mTime, aTime, sessionHash, verified FROM '.self::getTableName().' WHERE id=:id');
             $statement->bindParam(':id', $id);
             $statement->execute();
 
@@ -108,6 +120,7 @@ class UserDAO extends ModelDAO
                 $object = new User($rs->emailAddress, $rs->pseudonym, $rs->passwordHash);
                 $object->setId($id);
                 $object->setGroups(GroupDAO::getByUser($object));
+                $object->setVerified($rs->verified);
 
                 $object->setCreationTime(new DateTime('@'.$rs->cTime));
                 if($rs->mTime)
@@ -116,7 +129,7 @@ class UserDAO extends ModelDAO
                     $object->setAccessTime(new DateTime('@'.$rs->aTime));
             }
         } catch (PDOException $e) {
-            die(__METHOD__.' : '.$e->getMessage().'<br />');
+            throw new DAOException($e);
         }
 
         return $object;
@@ -143,7 +156,7 @@ class UserDAO extends ModelDAO
                     $object->setAccessTime(new DateTime('@'.$rs->aTime));
             }
         } catch (PDOException $e) {
-            die(__METHOD__.' : '.$e->getMessage().'<br />');
+            throw new DAOException($e);
         }
 
         return $object;
@@ -157,7 +170,7 @@ class UserDAO extends ModelDAO
 
             $statement->execute();
         } catch (PDOException $e) {
-            die(__METHOD__.' : '.$e->getMessage().'<br />');
+            throw new DAOException($e);
         }
     }
 
@@ -169,7 +182,7 @@ class UserDAO extends ModelDAO
 
             $statement->execute();
         } catch (PDOException $e) {
-            die(__METHOD__.' : '.$e->getMessage().'<br />');
+            throw new DAOException($e);
         }
     }
 
@@ -218,4 +231,105 @@ class UserDAO extends ModelDAO
 
         return $objects;
 	}
+
+	public static function createConfirmation(User $user): ?string
+	{
+		try {
+			$hash = User::createConfirmation();
+
+            $statement = self::prepare('INSERT INTO `userConfirmation` (userId, hash) values (:userId, :hash)');
+            $statement->bindValue(':userId', $user->getId());
+            $statement->bindValue(':hash', $hash);
+
+            $statement->execute();
+
+            return $hash;
+        } catch (PDOException $e) {
+            throw new DAOException($e);
+        }
+	}
+	private static function _confirm(User $user)
+	{
+		if(!$user->isVerified()) {
+			$user->setVerified(true);
+
+			try {
+	            $statement = self::prepare('DELETE FROM `userConfirmation` WHERE userId=:userId');
+	            $statement->bindValue(':userId', $user->getId());
+
+	            $statement->execute();
+	        } catch (PDOException $e) {
+	            throw new DAOException($e);
+	        }
+
+			return self::update($user) != 0;
+		}
+
+		return false;
+	}
+	public static function confirm(User $user, string $hash): bool
+    {
+		try {
+            $statement = self::prepare('SELECT userId FROM `userConfirmation` WHERE userId=:userId AND hash=:hash AND cTime > DATE_SUB(NOW(), INTERVAL 2 DAY)');
+            $statement->bindValue(':userId', $user->getId());
+            $statement->bindValue(':hash', $hash);
+
+            $statement->execute();
+
+			if($statement->fetch(PDO::FETCH_OBJ) != null)
+				return self::_confirm($user);
+        } catch (PDOException $e) {
+            throw new DAOException($e);
+        }
+
+        return false;
+    }
+
+
+
+
+    public static function createRecovery(User $user): ?string
+	{
+		if($user->isVerified()) {
+			try {
+				$hash = User::createConfirmation();
+
+	            $statement = self::prepare('INSERT IGNORE INTO `userRecovery` (userId, hash) values (:userId, :hash)');
+	            $statement->bindValue(':userId', $user->getId());
+	            $statement->bindValue(':hash', $hash);
+
+	            $statement->execute();
+
+				if($statement->rowCount())
+		            return $hash;
+	        } catch (PDOException $e) {
+	            throw new DAOException($e);
+	        }
+		}
+
+        return null;
+	}
+	public static function recover(User $user, string $hash): bool
+    {
+		try {
+            $statement = self::prepare('DELETE FROM `userRecovery` WHERE userId=:userId AND hash=:hash AND cTime > DATE_SUB(NOW(), INTERVAL 2 DAY)');
+            $statement->bindValue(':userId', $user->getId());
+            $statement->bindValue(':hash', $hash);
+
+            $statement->execute();
+
+			return $statement->rowCount() > 0;
+        } catch (PDOException $e) {
+            throw new DAOException($e);
+        }
+
+        return false;
+    }
+
+	public static function connect(User $user): bool
+    {
+		$user->connect();
+
+        return UserDAO::update($user) != 0;
+    }
 }

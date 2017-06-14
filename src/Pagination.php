@@ -57,26 +57,29 @@ class Pagination {
 
 	public function __toString()
 	{
+		$str = '';
 		$pageCount = $this->getPageCount();
 
-		$str = '<nav class="pagination"><ul>';
+		if($pageCount > 1) {
+			$str.= '<nav class="pagination"><ul>';
 
-		$str.= '<li'. (($this->currentPage <= 1)?' class="inactive"':'') .'><a href="'.$this->_buildUrl($this->currentPage-1).'">&lsaquo;</a></li>';
+			$str.= '<li'. (($this->currentPage <= 1)?' class="inactive"':'') .'><a href="'.$this->_buildUrl($this->currentPage-1).'">&lsaquo;</a></li>';
 
-		for($i=1; $i<=$pageCount; $i++) {
+			for($i=1; $i<=$pageCount; $i++) {
 
 
-			$str.= '<li';
-			if($i==$this->currentPage)
-				$str.= ' class="active"'. $i;
+				$str.= '<li';
+				if($i==$this->currentPage)
+					$str.= ' class="active"'. $i;
 
-				$str.= '><a href="'. $this->_buildUrl($i) .'">'.$i.'</a>';
-			$str.= '</li>';
+					$str.= '><a href="'. $this->_buildUrl($i) .'">'.$i.'</a>';
+				$str.= '</li>';
+			}
+
+			$str.= '<li'. (($this->currentPage >= $pageCount)?' class="inactive"':'') .'><a href="'.$this->_buildUrl($this->currentPage+1).'">&rsaquo;</a></li>';
+
+			$str.= '</ul></nav>';
 		}
-
-		$str.= '<li'. (($this->currentPage >= $pageCount)?' class="inactive"':'') .'><a href="'.$this->_buildUrl($this->currentPage+1).'">&rsaquo;</a></li>';
-
-		$str.= '</ul></nav>';
 
 		return $str;
 	}
