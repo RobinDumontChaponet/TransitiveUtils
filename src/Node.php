@@ -16,14 +16,19 @@ trait Node
         $this->_initDated();
     }
 
-    public function getUser(): User
+    public function getUser(): ?User
     {
         return $this->user;
     }
 
-    public function setUser(User $user): void
+    public function setUser(User $user = null): void
     {
         $this->user = $user;
+    }
+
+    public function hasUser(): bool
+    {
+        return isset($this->user);
     }
 
     protected function _nodeJsonSerialize(): array

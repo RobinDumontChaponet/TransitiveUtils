@@ -47,6 +47,8 @@ class UserDAO extends ModelDAO
         try {
             self::beginTransaction();
 
+            $user->setModificationTime(new DateTime());
+
             $statement = self::prepare('UPDATE '.self::getTableName().' SET emailAddress=:emailAddress, pseudonym=:pseudonym, passwordHash=:passwordHash, cTime=:cTime, mTime=:mTime, aTime=:aTime, sessionHash=:sessionHash, verified=:verified WHERE id=:id');
             $statement->bindValue(':id', $user->getId());
             $statement->bindValue(':emailAddress', $user->getEmailAddress());
@@ -140,7 +142,7 @@ class UserDAO extends ModelDAO
         $object = null;
 
         try {
-            $statement = self::prepare('SELECT id, pseudonym, passwordHash, cTime, mTime, aTime, sessionHash FROM '.self::getTableName().' WHERE emailAddress=:login');
+            $statement = self::prepare('SELECT id, pseudonym, passwordHash, cTime, mTime, aTime, sessionHash, verified FROM '.self::getTableName().' WHERE emailAddress=:login');
             $statement->bindParam(':login', $login);
             $statement->execute();
 
@@ -148,6 +150,7 @@ class UserDAO extends ModelDAO
                 $object = new User($login, $rs->pseudonym, $rs->passwordHash);
                 $object->setId($rs->id);
                 $object->setGroups(GroupDAO::getByUser($object));
+                $object->setVerified($rs->verified);
 
                 $object->setCreationTime(new DateTime('@'.$rs->cTime));
                 if($rs->mTime)
@@ -288,13 +291,13 @@ class UserDAO extends ModelDAO
 
 
 
-    public static function createRecovery(User $user): ?string
+    public static function createRecovery(User $user, bool $force = false): ?string
 	{
 		if($user->isVerified()) {
 			try {
 				$hash = User::createConfirmation();
 
-	            $statement = self::prepare('INSERT IGNORE INTO `userRecovery` (userId, hash) values (:userId, :hash)');
+	            $statement = self::prepare((($force)?'REPLACE':'INSERT IGNORE'). ' INTO `userRecovery` (userId, hash) values (:userId, :hash)');
 	            $statement->bindValue(':userId', $user->getId());
 	            $statement->bindValue(':hash', $hash);
 
