@@ -57,9 +57,9 @@ class Statement extends PDOStatement {
 	public function getQuery() {
 		return $this->queryString
 				.((!empty($this->where)  && !empty($this->queryString))? ' WHERE'.$this->where : '')
+				.((!empty($this->orderBy) && !empty($this->queryString))? ' '.$this->orderBy : '')
 				.((!empty($this->limit)  && !empty($this->queryString))? ' '.$this->limit : '')
-				.((!empty($this->offset) && !empty($this->queryString))? ' '.$this->offset : '')
-				.((!empty($this->orderBy) && !empty($this->queryString))? ' '.$this->orderBy : '');
+				.((!empty($this->offset) && !empty($this->queryString))? ' '.$this->offset : '');
 	}
 
 	public function autoBindClause(string $parameter, $value, string $sql, string $prefix = null, string $suffix = null, string $combinator = null)
@@ -105,7 +105,7 @@ class Statement extends PDOStatement {
 
 	public function setLimit(int $limit = null)
 	{
-		if($limit) {
+		if(is_integer($limit) && $limit > 0) {
 			$this->limit = 'LIMIT :limit';
 			$this->parameters[':limit'] = $limit;
 		} else
@@ -113,7 +113,7 @@ class Statement extends PDOStatement {
 	}
 	public function setOffset(int $offset = null)
 	{
-		if($offset) {
+		if(is_integer($offset) && $offset > 0) {
 			$this->offset = ($offset)?'OFFSET :offset' : '';
 			$this->parameters[':offset'] = $offset;
 		} else
