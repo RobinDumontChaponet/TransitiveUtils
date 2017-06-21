@@ -168,11 +168,6 @@ class User extends Model implements \JsonSerializable
         $this->pseudonym = $pseudonym;
     }
 
-    public function createConfirmation(): string
-    {
-		return md5(rand(0,1000));
-    }
-
     public function setVerified(bool $verified = true): void
     {
 	    $this->verified = $verified;
@@ -206,5 +201,11 @@ class User extends Model implements \JsonSerializable
             'pseudonyme' => htmlentities($this->getPseudonym()),
             'groups' => $this->getGroups(),
         ];
+    }
+
+
+    public static function createConfirmation(): string
+    {
+		return md5(rand(0,1000));
     }
 }

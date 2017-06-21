@@ -28,22 +28,30 @@ class Media extends Model implements \JsonSerializable
 
     private $maxSize;
 
-    private static $editableId = 0;
 
-    public static function editable(Media $media = null, string $name = null): string
+    public static function editable(Media $media = null, array $options = []): string
     {
+		static $editableId = 0;
+
         if(empty($media))
             $media = new self();
 
+		$name = $options['name'] ?? 'media'.$editableId;
+		$deletable = $options['deletable'] ?? true;
+
         $str = '<figure class="media editable auto-init" title="'.($media->getTitle() ?? 'Ajouter un média').'">';
-        $str .= '<label for="mediaInput'.self::$editableId.'">Téléverser</label>';
-        $str .= '<input type="file" id="mediaInput'.self::$editableId.'" name="mediaUpload" />';
-        $str .= '<input type="hidden" name="'.($name ?? 'media'.self::$editableId).'" disabled="disabled" />';
+
+        if($deletable)
+	        $str .= '<input type="checkbox" name="delete_'.($name).'" id="delete_'.($name).'" value="'.$media->getId().'" /><label for="delete_'.($name).'">Supprimer</label>';
+
+        $str .= '<label for="mediaInput'.$editableId.'">Téléverser</label>';
+        $str .= '<input type="file" id="mediaInput'.$editableId.'" name="mediaUpload" />';
+        $str .= '<input type="hidden" name="'.($name).'" disabled="disabled" />';
         if($media->id > 0)
             $str .= '<img src="'.self::$path.'/'.$media->getMaxSize().'/'.$media->getId().'.'.$media->getExtension().'" alt="" />';
         $str .= '<figcaption>'.($media->getName() ?? '').'</figcaption>';
         $str .= '</figure>';
-        ++self::$editableId;
+        ++$editableId;
 
         return $str;
     }
