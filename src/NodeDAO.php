@@ -27,7 +27,7 @@ abstract class NodeDAO extends ModelDAO
             return $object->getId();
         } catch (PDOException $e) {
             self::rollBack();
-            die(__METHOD__.' : '.$e->getMessage().'<br />');
+            die(__METHOD__.' : '.$e.'<br />');
         }
     }
 
@@ -51,7 +51,7 @@ abstract class NodeDAO extends ModelDAO
             return $id;
         } catch (PDOException $e) {
             self::rollBack();
-            die(__METHOD__.' : '.$e->getMessage().'<br />');
+            die(__METHOD__.' : '.$e.'<br />');
         }
     }
 
@@ -64,7 +64,7 @@ abstract class NodeDAO extends ModelDAO
 
             return $statement->rowCount();
         } catch (PDOException $e) {
-            die(__METHOD__.' : '.$e->getMessage().'<br />');
+            die(__METHOD__.' : '.$e.'<br />');
         }
     }
 
@@ -88,7 +88,7 @@ abstract class NodeDAO extends ModelDAO
                     $node->setAccessTime(new DateTime('@'.$rs->aTime));
             }
         } catch (PDOException $e) {
-            die(__METHOD__.' : '.$e->getMessage().'<br />');
+            die(__METHOD__.' : '.$e.'<br />');
         }
     }
 }
