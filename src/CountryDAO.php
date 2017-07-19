@@ -31,7 +31,7 @@ abstract class CountryDAO extends ModelDAO
     {
         try {
             $statement = self::prepare('UPDATE '.self::getTableName().' SET code=:code, alpha2=:alpha2, alpha3=:alph3, name=:name WHERE id=:id');
-			$statement->bindValue(':code', $object->getCode());
+            $statement->bindValue(':code', $object->getCode());
             $statement->bindValue(':alpha2', $object->getAlpha2());
             $statement->bindValue(':alpha3', $object->getAlpha3());
             $statement->bindValue(':name', $object->getName());

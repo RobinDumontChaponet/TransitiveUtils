@@ -34,8 +34,8 @@ class User extends Model implements \JsonSerializable
     private $groups;
 
     /**
-	 * @var bool
-	 */
+     * @var bool
+     */
     private $verified = false;
 
     private const HASH_COST = 12;
@@ -49,7 +49,7 @@ class User extends Model implements \JsonSerializable
 
         $this->pseudonym = $pseudonym;
 
-		$this->setPasswordHash($passwordHash);
+        $this->setPasswordHash($passwordHash);
 
         $this->sessionHash = '';
         $this->groups = $groups;
@@ -170,11 +170,12 @@ class User extends Model implements \JsonSerializable
 
     public function setVerified(bool $verified = true): void
     {
-	    $this->verified = $verified;
+        $this->verified = $verified;
     }
+
     public function isVerified(): bool
     {
-	    return $this->verified;
+        return $this->verified;
     }
 
     public function __toString(): string
@@ -203,9 +204,8 @@ class User extends Model implements \JsonSerializable
         ];
     }
 
-
     public static function createConfirmation(): string
     {
-		return md5(rand(0,1000));
+        return md5(rand(0, 1000));
     }
 }

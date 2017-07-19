@@ -27,7 +27,7 @@ trait CountryContainer
     protected function _countryContainerJsonSerialize(): array
     {
         return [
-            'country' => $this->getCountry()
+            'country' => $this->getCountry(),
         ];
     }
 }

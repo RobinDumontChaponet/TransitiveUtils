@@ -51,6 +51,7 @@ class Country extends Model implements \JsonSerializable
     {
         $this->code = $code;
     }
+
     public function setAlpha2(string $alpha2 = null): void
     {
         $this->alpha2 = $alpha2;
@@ -64,8 +65,8 @@ class Country extends Model implements \JsonSerializable
     public function __toString()
     {
         $str = '<span class="country">';
-        $str.= $this->getName();
-        $str.= '</span>';
+        $str .= $this->getName();
+        $str .= '</span>';
 
         return $str;
     }
@@ -77,7 +78,7 @@ class Country extends Model implements \JsonSerializable
         + [
             'code' => htmlentities($this->getCode()),
             'alpha2' => htmlentities($this->getAlpha2()),
-            'alpha3' => htmlentities($this->getAlpha3())
+            'alpha3' => htmlentities($this->getAlpha3()),
         ];
     }
 }

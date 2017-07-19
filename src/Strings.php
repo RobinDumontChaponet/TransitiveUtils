@@ -196,6 +196,6 @@ abstract class Strings
     }
 
     public static function pluralize($value, $text) {
-		return $value . ' ' . $text . (($value > 1)?'s':'');
-	}
+        return $value.' '.$text.(($value > 1) ? 's' : '');
+    }
 }

@@ -2,7 +2,6 @@
 
 namespace Transitive\Utils;
 
-use PDOException;
 use Transitive\Utils\Database as DB;
 
 abstract class ModelDAO implements CRUDInterface
@@ -56,29 +55,21 @@ abstract class ModelDAO implements CRUDInterface
 
     public static function delete($object)
     {
-        try {
-            $statement = self::prepare('DELETE FROM '.self::getTableName().' WHERE id=?');
-            $statement->bindValue(1, $object->getId());
-            $statement->execute();
+        $statement = self::prepare('DELETE FROM '.self::getTableName().' WHERE id=?');
+        $statement->bindValue(1, $object->getId());
+        $statement->execute();
 
-            return $statement->rowCount();
-        } catch (PDOException $e) {
-            die(__METHOD__.' : '.$e->getMessage().'<br />');
-        }
+        return $statement->rowCount();
     }
 
     public static function count(): ?int
     {
-        try {
-            $statement = self::prepare('SELECT COUNT(*) AS c FROM '.self::getTableName());
+        $statement = self::prepare('SELECT COUNT(*) AS c FROM '.self::getTableName());
 
-            $statement->execute();
+        $statement->execute();
 
-            if ($rs = $statement->fetch(\PDO::FETCH_OBJ)) {
-                return $rs->c;
-            }
-        } catch (PDOException $e) {
-            throw new \Exception($e->getMessage());
+        if ($rs = $statement->fetch(\PDO::FETCH_OBJ)) {
+            return $rs->c;
         }
     }
 }

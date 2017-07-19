@@ -2,128 +2,132 @@
 
 namespace Transitive\Utils;
 
-class Pagination {
+class Pagination
+{
+    private $itemCount;
+    private $itemPerPage;
+    private $currentPage;
+    private $currentPageItemCount;
 
-	private $itemCount;
-	private $itemPerPage;
-	private $currentPage;
-	private $currentPageItemCount;
+    private $maxPageDisplay = 10;
+    private $span = 2;
 
-	private $maxPageDisplay = 10;
-	private $span = 2;
+    public function __construct(int $itemCount, int $itemPerPage = 12, $currentPage = 1)
+    {
+        $this->itemCount = $itemCount;
+        $this->itemPerPage = $itemPerPage;
+        $this->setCurrentPage($currentPage);
+        $this->setCurrentPageItemCount($itemPerPage);
+    }
 
-	function __construct(int $itemCount, int $itemPerPage = 12, $currentPage = 1)
-	{
-		$this->itemCount = $itemCount;
-		$this->itemPerPage = $itemPerPage;
-		$this->setCurrentPage($currentPage);
-		$this->setCurrentPageItemCount($itemPerPage);
-	}
+    public function getItemCount(): int
+    {
+        return $this->itemCount;
+    }
 
-	public function getItemCount(): int
-	{
-		return $this->itemCount;
-	}
-	public function getItemPerPage(): int
-	{
-		return $this->itemPerPage;
-	}
-	public function getOffset(): int
-	{
-		return $this->itemPerPage*($this->currentPage-1);
-	}
+    public function getItemPerPage(): int
+    {
+        return $this->itemPerPage;
+    }
 
-	public function getPageCount(): int
-	{
-		if($this->currentPageItemCount < $this->itemPerPage)
-			return $this->currentPage;
+    public function getOffset(): int
+    {
+        return $this->itemPerPage * ($this->currentPage - 1);
+    }
 
-		return ceil($this->itemCount/$this->itemPerPage);
-	}
+    public function getPageCount(): int
+    {
+        if($this->currentPageItemCount < $this->itemPerPage)
+            return $this->currentPage;
 
-	public function getCurrentPage()
-	{
-		return $this->currentPage;
-	}
-	public function setCurrentPage($currentPage = 1)
-	{
-		$this->currentPage = intval($currentPage);
+        return ceil($this->itemCount / $this->itemPerPage);
+    }
 
-		if($this->currentPage <= 0 || $this->currentPage > $this->getPageCount())
-			$this->currentPage = 1;
-	}
-	public function setCurrentPageItemCount(int $itemCount = null)
-	{
-		$this->currentPageItemCount = intval($itemCount);
-	}
+    public function getCurrentPage()
+    {
+        return $this->currentPage;
+    }
 
-	private function _buildUrl(int $page = 1): string
-	{
-		$params = array_merge($_GET, array('p' => $page));
-		if(isset($params['request']))
-			unset($params['request']);
-		$queryString = http_build_query($params);
+    public function setCurrentPage($currentPage = 1)
+    {
+        $this->currentPage = intval($currentPage);
 
-		return SELF. '/'. @$_GET['request']. '?'. $queryString;
-	}
+        if($this->currentPage <= 0 || $this->currentPage > $this->getPageCount())
+            $this->currentPage = 1;
+    }
 
-	private function _pageListGenerator()
-	{
-		$array = [];
-		$pageCount = $this->getPageCount();
-		if($pageCount > $this->maxPageDisplay) {
-			$array = array_filter(array_unique(array_merge(range($this->currentPage-$this->span, $this->currentPage+$this->span))), function ($v) use($pageCount) {
-				return $v > 1 && $v<$pageCount;
-			});
+    public function setCurrentPageItemCount(int $itemCount = null)
+    {
+        $this->currentPageItemCount = intval($itemCount);
+    }
 
-			if($this->currentPage > 1)
-				array_unshift($array, 1, 0);
-			else
-				array_unshift($array, 1);
+    private function _buildUrl(int $page = 1): string
+    {
+        $params = array_merge($_GET, array('p' => $page));
+        if(isset($params['request']))
+            unset($params['request']);
+        $queryString = http_build_query($params);
 
-			if($this->currentPage < $pageCount)
-				$array[] =  0;
+        return SELF.'/'.@$_GET['request'].'?'.$queryString;
+    }
 
-			$array[] = $this->getPageCount();
-		} else
-			$array = range(1, $pageCount);
+    private function _pageListGenerator()
+    {
+        $array = [];
+        $pageCount = $this->getPageCount();
+        if($pageCount > $this->maxPageDisplay) {
+            $array = array_filter(array_unique(array_merge(range($this->currentPage - $this->span, $this->currentPage + $this->span))), function ($v) use ($pageCount) {
+                return $v > 1 && $v < $pageCount;
+            });
 
-		foreach($array as $i)
-			yield $i;
-	}
+            if($this->currentPage > 1)
+                array_unshift($array, 1, 0);
+            else
+                array_unshift($array, 1);
 
-	public function __toString()
-	{
-		$str = '';
-		$pageCount = $this->getPageCount();
+            if($this->currentPage < $pageCount)
+                $array[] = 0;
 
-		if($pageCount > 1) {
-			$str.= '<nav class="pagination"><ul>';
+            $array[] = $this->getPageCount();
+        } else
+            $array = range(1, $pageCount);
 
-			$str.= '<li'. (($this->currentPage <= 1)?' class="inactive"':'') .'><a href="'.$this->_buildUrl($this->currentPage-1).'">&lsaquo;</a></li>';
+        foreach($array as $i)
+            yield $i;
+    }
 
-			foreach($this->_pageListGenerator() as $i) {
-				if($i>$this->currentPage && $this->currentPageItemCount < $this->itemPerPage)
-					break;
+    public function __toString()
+    {
+        $str = '';
+        $pageCount = $this->getPageCount();
 
-				if($i==0) {
-					$str.= '<li class="spacer">…</li>';
-					continue;
-				}
+        if($pageCount > 1) {
+            $str .= '<nav class="pagination"><ul>';
 
-				$str.= '<li';
-				if($i==$this->currentPage)
-					$str.= ' class="active"'. $i;
+            $str .= '<li'.(($this->currentPage <= 1) ? ' class="inactive"' : '').'><a href="'.$this->_buildUrl($this->currentPage - 1).'">&lsaquo;</a></li>';
 
-					$str.= '><a href="'. $this->_buildUrl($i) .'">'.$i.'</a>';
-				$str.= '</li>';
-			}
+            foreach($this->_pageListGenerator() as $i) {
+                if($i > $this->currentPage && $this->currentPageItemCount < $this->itemPerPage)
+                    break;
 
-			$str.= '<li'. (($this->currentPage >= $pageCount)?' class="inactive"':'') .'><a href="'.$this->_buildUrl($this->currentPage+1).'">&rsaquo;</a></li>';
+                if($i == 0) {
+                    $str .= '<li class="spacer">…</li>';
+                    continue;
+                }
 
-			$str.= '</ul></nav>';
-		}
+                $str .= '<li';
+                if($i == $this->currentPage)
+                    $str .= ' class="active"'.$i;
 
-		return $str;
-	}
+                    $str .= '><a href="'.$this->_buildUrl($i).'">'.$i.'</a>';
+                $str .= '</li>';
+            }
+
+            $str .= '<li'.(($this->currentPage >= $pageCount) ? ' class="inactive"' : '').'><a href="'.$this->_buildUrl($this->currentPage + 1).'">&rsaquo;</a></li>';
+
+            $str .= '</ul></nav>';
+        }
+
+        return $str;
+    }
 }

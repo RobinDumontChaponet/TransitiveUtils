@@ -5,7 +5,8 @@ namespace Transitive\Utils;
 use PDO;
 use PDOStatement;
 
-class Statement extends PDOStatement {
+class Statement extends PDOStatement
+{
     public $pdo;
 
     private $where = '';
@@ -26,124 +27,124 @@ class Statement extends PDOStatement {
         $this->o = null;
     }
 
-	public function execute($inputParameters = null)
-	{
-		if(!$this->o && (!empty($this->where) || !empty($this->limit) || !empty($this->offset)) && !empty($this->queryString))
-			$this->o = $this->pdo->prepare($this->getQuery());
+    public function execute($inputParameters = null)
+    {
+        if(!$this->o && (!empty($this->where) || !empty($this->limit) || !empty($this->offset)) && !empty($this->queryString))
+            $this->o = $this->pdo->prepare($this->getQuery());
 
 /*
-		if(!$this->o) {
-			file_put_contents(LOG.'queries.log', $this->getQuery().PHP_EOL, FILE_APPEND);
-			if(!empty($this->parameters))
-				file_put_contents(LOG.'queries.log', json_encode($this->parameters).PHP_EOL, FILE_APPEND);
-		}
+        if(!$this->o) {
+            file_put_contents(LOG.'queries.log', $this->getQuery().PHP_EOL, FILE_APPEND);
+            if(!empty($this->parameters))
+                file_put_contents(LOG.'queries.log', json_encode($this->parameters).PHP_EOL, FILE_APPEND);
+        }
 */
 
-		if(empty($inputParameters)) {
-			if($this->o) {
-				foreach($this->parameters as $parameter => $value)
-					$this->o->bindValue($parameter, $value);
+        if(empty($inputParameters)) {
+            if($this->o) {
+                foreach($this->parameters as $parameter => $value)
+                    $this->o->bindValue($parameter, $value);
 
-				return $this->o->execute();
-			} else
-				return parent::execute();
-		} else
-			if($this->o)
-				return $this->o->execute($inputParameters+$this->parameters);
-			else
-				return parent::execute($inputParameters+$this->parameters);
-	}
+                return $this->o->execute();
+            } else
+                return parent::execute();
+        } elseif($this->o)
+                return $this->o->execute($inputParameters + $this->parameters);
+            else
+                return parent::execute($inputParameters + $this->parameters);
+    }
 
-	public function getQuery() {
-		return $this->queryString
-				.((!empty($this->where)  && !empty($this->queryString))? ' WHERE'.$this->where : '')
-				.((!empty($this->orderBy) && !empty($this->queryString))? ' '.$this->orderBy : '')
-				.((!empty($this->limit)  && !empty($this->queryString))? ' '.$this->limit : '')
-				.((!empty($this->offset) && !empty($this->queryString))? ' '.$this->offset : '');
-	}
+    public function getQuery() {
+        return $this->queryString
+                .((!empty($this->where) && !empty($this->queryString)) ? ' WHERE'.$this->where : '')
+                .((!empty($this->orderBy) && !empty($this->queryString)) ? ' '.$this->orderBy : '')
+                .((!empty($this->limit) && !empty($this->queryString)) ? ' '.$this->limit : '')
+                .((!empty($this->offset) && !empty($this->queryString)) ? ' '.$this->offset : '');
+    }
 
-	public function autoBindClause(string $parameter, $value, string $sql, string $prefix = null, string $suffix = null, string $combinator = null)
-	{
-		if(!isset($combinator))
-			$combinator = $this->combinator;
+    public function autoBindClause(string $parameter, $value, string $sql, string $prefix = null, string $suffix = null, string $combinator = null)
+    {
+        if(!isset($combinator))
+            $combinator = $this->combinator;
 
-		if(!empty($value))
-			$this->bindClause($parameter, $value, $sql, $prefix, $suffix, $combinator);
+        if(!empty($value))
+            $this->bindClause($parameter, $value, $sql, $prefix, $suffix, $combinator);
 
-		return false;
-	}
+        return false;
+    }
 
-	public function bindClause(string $parameter, $value, string $sql, string $prefix = null, string $suffix = null, string $combinator = null)
-	{
-		if(!isset($combinator))
-			$combinator = $this->combinator;
+    public function bindClause(string $parameter, $value, string $sql, string $prefix = null, string $suffix = null, string $combinator = null)
+    {
+        if(!isset($combinator))
+            $combinator = $this->combinator;
 
-		if(is_array($value))
-			foreach($value as $key => $item) {
-				if(!is_scalar($item))
-					$item = $key;
+        if(is_array($value))
+            foreach($value as $key => $item) {
+                if(!is_scalar($item))
+                    $item = $key;
 
-				$this->_bindClause($parameter, $item, $sql, $prefix, $suffix, $combinator);
-			}
-		else
-			$this->_bindClause($parameter, $value, $sql, $prefix, $suffix, $combinator);
-	}
+                $this->_bindClause($parameter, $item, $sql, $prefix, $suffix, $combinator);
+            }
+        else
+            $this->_bindClause($parameter, $value, $sql, $prefix, $suffix, $combinator);
+    }
 
-	private function _bindClause(string $parameter, $value, string $sql, string $prefix = null, string $suffix = null, string $combinator = null)
-	{
-		if(!isset($combinator))
-			$combinator = $this->combinator;
+    private function _bindClause(string $parameter, $value, string $sql, string $prefix = null, string $suffix = null, string $combinator = null)
+    {
+        if(!isset($combinator))
+            $combinator = $this->combinator;
 
-		$this->parameters[$parameter.'_'.$this->index] = $prefix.$value.$suffix;
-		$this->where.= ' ' . ((!empty($this->where))?$combinator.' ':'') . '('.$sql .'_'.$this->index++.')';
-	}
+        $this->parameters[$parameter.'_'.$this->index] = $prefix.$value.$suffix;
+        $this->where .= ' '.((!empty($this->where)) ? $combinator.' ' : '').'('.$sql.'_'.$this->index++.')';
+    }
 
-	public function getStatement()
-	{
-		return $this->o ?? $this;
-	}
+    public function getStatement()
+    {
+        return $this->o ?? $this;
+    }
 
-	public function setLimit(int $limit = null)
-	{
-		if(is_integer($limit) && $limit > 0) {
-			$this->limit = 'LIMIT :limit';
-			$this->parameters[':limit'] = $limit;
-		} else
-			$this->limit = '';
-	}
-	public function setOffset(int $offset = null)
-	{
-		if(is_integer($offset) && $offset > 0) {
-			$this->offset = ($offset)?'OFFSET :offset' : '';
-			$this->parameters[':offset'] = $offset;
-		} else
-			$this->offset = '';
-	}
+    public function setLimit(int $limit = null)
+    {
+        if(is_integer($limit) && $limit > 0) {
+            $this->limit = 'LIMIT :limit';
+            $this->parameters[':limit'] = $limit;
+        } else
+            $this->limit = '';
+    }
 
-	public function orderBy(string $column = null, string $direction = null)
-	{
-		if($column) {
-			$column = htmlspecialchars(htmlentities(strip_tags(addcslashes($column, '%_')), ENT_NOQUOTES, 'UTF-8'));
+    public function setOffset(int $offset = null)
+    {
+        if(is_integer($offset) && $offset > 0) {
+            $this->offset = ($offset) ? 'OFFSET :offset' : '';
+            $this->parameters[':offset'] = $offset;
+        } else
+            $this->offset = '';
+    }
 
-			$this->orderBy = 'ORDER BY '.$column;
-			if(isset($direction))
-				$this->orderBy.= (strtolower($direction)=='desc')?' DESC':' ASC';
-		} else
-			$this->orderBy = '';
-	}
+    public function orderBy(string $column = null, string $direction = null)
+    {
+        if($column) {
+            $column = htmlspecialchars(htmlentities(strip_tags(addcslashes($column, '%_')), ENT_NOQUOTES, 'UTF-8'));
 
-	public function appendSQL(string $sql)
-	{
-		$this->where.= ' ' .$sql;
-	}
+            $this->orderBy = 'ORDER BY '.$column;
+            if(isset($direction))
+                $this->orderBy .= (strtolower($direction) == 'desc') ? ' DESC' : ' ASC';
+        } else
+            $this->orderBy = '';
+    }
 
-	public function addParam(string $key, $value)
-	{
-		$this->parameters[$key] = $value;
-	}
+    public function appendSQL(string $sql)
+    {
+        $this->where .= ' '.$sql;
+    }
 
-	public function setCombinator(string $combinator = 'OR')
-	{
-		$this->combinator = $combinator;
-	}
+    public function addParam(string $key, $value)
+    {
+        $this->parameters[$key] = $value;
+    }
+
+    public function setCombinator(string $combinator = 'OR')
+    {
+        $this->combinator = $combinator;
+    }
 }
