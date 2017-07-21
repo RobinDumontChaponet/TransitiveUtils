@@ -32,27 +32,27 @@ trait Dated
         return $this->cTime;
     }
 
-    public function getModificationTime(): ?DateTime
+    public function getModificationTime()
     {
         return $this->mTime;
     }
 
-    public function getAccessTime(): ?DateTime
+    public function getAccessTime()
     {
         return $this->aTime;
     }
 
-    public function setCreationTime(DateTime $cTime): void
+    public function setCreationTime(DateTime $cTime) 
     {
         $this->cTime = $cTime;
     }
 
-    public function setModificationTime(DateTime $mTime = null): void
+    public function setModificationTime(DateTime $mTime = null) 
     {
         $this->mTime = $mTime;
     }
 
-    public function setAccessTime(DateTime $aTime = null): void
+    public function setAccessTime(DateTime $aTime = null) 
     {
         $this->aTime = $aTime;
     }

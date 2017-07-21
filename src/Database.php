@@ -34,17 +34,17 @@ class Database
         return $this->tablePrefix;
     }
 
-    public function setTablePrefix(string $value): void
+    public function setTablePrefix(string $value)
     {
         $this->tablePrefix = $value;
     }
 
-    public static function addDatabase(string $id, self $database): void
+    public static function addDatabase(string $id, self $database)
     {
         self::$databases[$id] = $database;
     }
 
-    public function getInstance(): ?PDO
+    public function getInstance()
     {
         if (!isset(self::$PDOInstances[$this->dbType.':'.$this->dbName.','.$this->dbUser])) {
             try {
@@ -72,13 +72,14 @@ class Database
         return self::$PDOInstances[$this->dbType.':'.$this->dbName.','.$this->dbUser];
     }
 
-    public static function getInstanceById($id): ?PDO {
+    public static function getInstanceById($id)
+    {
         if(!isset(self::$databases[$id]))
             throw new Exception('<b>Error '.__METHOD__.' : Database with id "'.$id.'" does not exist in database pool.<br />'.PHP_EOL);
         return self::$databases[$id]->getInstance();
     }
 
-    public static function getDatabaseById($id): ?self
+    public static function getDatabaseById($id)
     {
         return self::$databases[$id];
     }

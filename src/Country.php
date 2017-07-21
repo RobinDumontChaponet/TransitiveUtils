@@ -32,32 +32,32 @@ class Country extends Model implements \JsonSerializable
         $this->setAlpha3($alpha3);
     }
 
-    public function getCode(): ?int
+    public function getCode()
     {
         return $this->code;
     }
 
-    public function getAlpha2(): ?string
+    public function getAlpha2()
     {
         return $this->alpha2;
     }
 
-    public function getAlpha3(): ?string
+    public function getAlpha3()
     {
         return $this->alpha3;
     }
 
-    public function setCode(int $code = null): void
+    public function setCode(int $code = null) 
     {
         $this->code = $code;
     }
 
-    public function setAlpha2(string $alpha2 = null): void
+    public function setAlpha2(string $alpha2 = null) 
     {
         $this->alpha2 = $alpha2;
     }
 
-    public function setAlpha3(string $alpha3 = null): void
+    public function setAlpha3(string $alpha3 = null) 
     {
         $this->alpha3 = $alpha3;
     }

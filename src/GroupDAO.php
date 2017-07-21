@@ -59,7 +59,7 @@ class GroupDAO extends ModelDAO
         return $objects;
     }
 
-    public static function getById(int $id): ?Group
+    public static function getById(int $id)
     {
         $object = null;
 

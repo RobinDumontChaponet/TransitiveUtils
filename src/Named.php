@@ -30,7 +30,7 @@ trait Named
         return $this->title ?? '';
     }
 
-    public function setName(string $name): void
+    public function setName(string $name) 
     {
         $e = null;
         $name = trim($name);
@@ -46,7 +46,7 @@ trait Named
         $this->name = $name;
     }
 
-    public function setTitle(string $title = null): void
+    public function setTitle(string $title = null) 
     {
         $e = null;
         $title = trim($title);

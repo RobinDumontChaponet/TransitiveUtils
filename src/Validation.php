@@ -23,7 +23,7 @@ abstract class Validation
         return self::isFormValid();
     }
 
-    public static function trimForm(array $formElements, array &$values): void
+    public static function trimForm(array $formElements, array &$values) 
     {
         if(isset($formElements)) {
             foreach($formElements as $elementName)
@@ -41,7 +41,7 @@ abstract class Validation
         return (isset(self::$formValidation[$formElementName])) ? self::$formValidation[$formElementName] : null;
     }
 
-    public static function invalidMessage(string $formElementName): ?string
+    public static function invalidMessage(string $formElementName)
     {
         return (!empty($formElementName) && ($message = self::isValid($formElementName)) !== true) ? $message : '';
     }

@@ -16,7 +16,7 @@ abstract class Model implements \JsonSerializable
         return $this->id;
     }
 
-    public function setId(int $id = -1): void
+    public function setId(int $id = -1) 
     {
         $this->id = trim($id);
     }

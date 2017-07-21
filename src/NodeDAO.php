@@ -68,7 +68,7 @@ abstract class NodeDAO extends ModelDAO
         }
     }
 
-    public static function pushTo(Model &$node): void
+    public static function pushTo(Model &$node) 
     {
         $id = $node->getId();
 

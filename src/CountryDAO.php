@@ -64,7 +64,7 @@ abstract class CountryDAO extends ModelDAO
         return $objects;
     }
 
-    public static function getById(string $id): ?Country
+    public static function getById(string $id)
     {
         $object = null;
 

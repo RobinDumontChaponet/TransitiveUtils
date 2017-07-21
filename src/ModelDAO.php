@@ -23,7 +23,7 @@ abstract class ModelDAO implements CRUDInterface
         return $cc::DATABASE_CONNECTION_ID;
     }
 
-    protected static function getInstance(): ?\PDO
+    protected static function getInstance()
     {
         return DB::getInstanceById(self::DATABASE_CONNECTION_ID);
     }
@@ -62,7 +62,7 @@ abstract class ModelDAO implements CRUDInterface
         return $statement->rowCount();
     }
 
-    public static function count(): ?int
+    public static function count()
     {
         $statement = self::prepare('SELECT COUNT(*) AS c FROM '.self::getTableName());
 

@@ -9,7 +9,7 @@ trait CountryContainer
      */
     protected $country = null;
 
-    public function setCountry(Country $country = null): void
+    public function setCountry(Country $country = null) 
     {
         $this->country = $country;
     }
@@ -19,7 +19,7 @@ trait CountryContainer
         return isset($this->country);
     }
 
-    public function getCountry(): ?Country
+    public function getCountry()
     {
         return $this->country;
     }

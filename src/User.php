@@ -38,7 +38,7 @@ class User extends Model implements \JsonSerializable
      */
     private $verified = false;
 
-    private const HASH_COST = 12;
+    const HASH_COST = 12;
 
     public function __construct(string $emailAddress, string $pseudonym, string $passwordHash = '', array $groups = array())
     {
@@ -60,7 +60,7 @@ class User extends Model implements \JsonSerializable
         return $this->getEmailAddress();
     }
 
-    public function setLogin(string $emailAddress): void
+    public function setLogin(string $emailAddress)
     {
         $this->setEmailAddress($emailAddress);
     }
@@ -70,7 +70,7 @@ class User extends Model implements \JsonSerializable
         return $this->passwordHash;
     }
 
-    public function getSessionHash(): ?string
+    public function getSessionHash()
     {
         return $this->sessionHash;
     }
@@ -80,7 +80,7 @@ class User extends Model implements \JsonSerializable
         return $this->emailAddress;
     }
 
-    public function setEmailAddress(string $emailAddress): void
+    public function setEmailAddress(string $emailAddress)
     {
         $e = null;
         $emailAddress = trim($emailAddress);
@@ -96,22 +96,22 @@ class User extends Model implements \JsonSerializable
         $this->emailAddress = $emailAddress;
     }
 
-    public function setPassword(string $password): void
+    public function setPassword(string $password)
     {
         $this->passwordHash = password_hash(trim($password), PASSWORD_BCRYPT, ['cost' => self::HASH_COST]);
     }
 
-    public function setPasswordHash(string $passwordHash): void
+    public function setPasswordHash(string $passwordHash)
     {
         $this->passwordHash = trim($passwordHash);
     }
 
-    private function setSessionHash(string $sessionHash): void
+    private function setSessionHash(string $sessionHash)
     {
         $this->sessionHash = $sessionHash;
     }
 
-    public function setGroups(array $groups): void
+    public function setGroups(array $groups)
     {
         $this->groups = $groups;
     }
@@ -121,17 +121,17 @@ class User extends Model implements \JsonSerializable
         return $this->groups;
     }
 
-    public function addGroup(Group $group): void
+    public function addGroup(Group $group)
     {
         $this->groups[$group->getId()] = $group;
     }
 
-    public function removeGroup(int $groupId): void
+    public function removeGroup(int $groupId)
     {
         $this->removeGroupById($group->getId());
     }
 
-    public function removeGroupById(int $groupId): void
+    public function removeGroupById(int $groupId)
     {
         if(isset($this->groups[$groupId]))
             unset($this->groups[$groupId]);
@@ -152,7 +152,7 @@ class User extends Model implements \JsonSerializable
         return $this->pseudonym;
     }
 
-    public function setPseudonym(string $pseudonym): void
+    public function setPseudonym(string $pseudonym)
     {
         $e = null;
         $pseudonym = trim($pseudonym);
@@ -168,7 +168,7 @@ class User extends Model implements \JsonSerializable
         $this->pseudonym = $pseudonym;
     }
 
-    public function setVerified(bool $verified = true): void
+    public function setVerified(bool $verified = true)
     {
         $this->verified = $verified;
     }
@@ -187,7 +187,7 @@ class User extends Model implements \JsonSerializable
         return $str;
     }
 
-    public function connect(): void
+    public function connect()
     {
         Sessions::set('user', $this);
 

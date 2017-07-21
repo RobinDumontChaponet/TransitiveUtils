@@ -16,12 +16,12 @@ trait Node
         $this->_initDated();
     }
 
-    public function getUser(): ?User
+    public function getUser()
     {
         return $this->user;
     }
 
-    public function setUser(User $user = null): void
+    public function setUser(User $user = null) 
     {
         $this->user = $user;
     }

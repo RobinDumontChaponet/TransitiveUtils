@@ -11,7 +11,7 @@ abstract class Sessions
         return session_status() != PHP_SESSION_NONE;
     }
 
-    public static function start(/*...*/): void
+    public static function start(/*...*/)
     {
     if (!self::isStarted())
         session_start();
@@ -54,13 +54,13 @@ abstract class Sessions
             return $_SESSION[self::$keyPrefix.$key];
     }
 
-    public static function delete(string $key): void
+    public static function delete(string $key)
     {
         if(self::isset($key))
             unset($_SESSION[self::$keyPrefix.$key]);
     }
 
-    public static function destroy(): void
+    public static function destroy()
     {
         if (self::isStarted()) {
             session_unset();

@@ -29,7 +29,7 @@ abstract class Optimization
         return $path['dirname'].'/'.$path['filename'].'.'.filemtime($src).'.'.$path['extension'];
     }
 
-    public static function listIncludes(): void
+    public static function listIncludes() 
     {
         $includes = get_included_files();
 
@@ -56,7 +56,7 @@ class Timed
          - ($rus["ru_$index.tv_sec"] * 1000 + intval($rus["ru_$index.tv_usec"] / 1000));
     }
 
-    public function printResult(): void
+    public function printResult() 
     {
         $ru = getrusage();
         $time = microtime(true) - $_SERVER['REQUEST_TIME_FLOAT'];

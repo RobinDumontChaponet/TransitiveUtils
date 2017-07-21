@@ -68,7 +68,7 @@ abstract class MediaDAO extends ModelDAO
         return $objects;
     }
 
-     public static function getById(string $id): ?Media
+     public static function getById(string $id)
     {
         $object = null;
 
@@ -88,7 +88,7 @@ abstract class MediaDAO extends ModelDAO
         return $object;
     }
 
-    public static function upload(string $data): ?Media
+    public static function upload(string $data)
     {
         $media = new Media();
 

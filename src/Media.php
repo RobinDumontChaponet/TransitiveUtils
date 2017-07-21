@@ -151,31 +151,31 @@ class Media extends Model implements \JsonSerializable
         return $this->maxSize;
     }
 
-    public function setType(string $type): void
+    public function setType(string $type)
     {
         if(!in_array($type, self::$types))
             throw new \Exception('Invalid type : '.$type);
         $this->type = $type;
     }
 
-    public function setMimeType(string $mimeType): void
+    public function setMimeType(string $mimeType)
     {
         $this->mimeType = $mimeType;
     }
 
-    public function setExtension(string $extension): void
+    public function setExtension(string $extension)
     {
         $this->extension = $extension;
     }
 
-    public function setMaxSize(string $maxSize): void
+    public function setMaxSize(string $maxSize)
     {
         if(!in_array($maxSize, self::$sizes))
             throw new \Exception('Invalid size');
         $this->maxSize = $maxSize;
     }
 
-    public function setName(string $name): void
+    public function setName(string $name)
     {
         $name = trim($name);
 
@@ -214,7 +214,7 @@ class Media extends Model implements \JsonSerializable
         ] + $this->_namedJsonSerialize();
     }
 
-    public static function ImgElement(?Media $media = null): string
+    public static function ImgElement(Media $media = null): string
     {
         if($media)
             return $media->asImgElement();

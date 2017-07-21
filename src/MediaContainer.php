@@ -24,7 +24,7 @@ trait MediaContainer
         return true;
     }
 
-    public function lockMedia(bool $lock = true): void
+    public function lockMedia(bool $lock = true) 
     {
         $this->mediaLocked = $lock;
     }
@@ -34,7 +34,7 @@ trait MediaContainer
         return isset($this->media);
     }
 
-    public function getMedia(): ?Media
+    public function getMedia()
     {
         return $this->media;
     }

@@ -109,7 +109,7 @@ class UserDAO extends ModelDAO
         return $objects;
     }
 
-    public static function getById(int $id): ?User
+    public static function getById(int $id)
     {
         $object = null;
 
@@ -137,7 +137,7 @@ class UserDAO extends ModelDAO
         return $object;
     }
 
-    public static function getByLogin(string $login): ?User
+    public static function getByLogin(string $login)
     {
         $object = null;
 
@@ -236,7 +236,7 @@ class UserDAO extends ModelDAO
         return $objects;
     }
 
-    public static function createConfirmation(User $user): ?string
+    public static function createConfirmation(User $user)
     {
         try {
             $hash = User::createConfirmation();
@@ -291,7 +291,7 @@ class UserDAO extends ModelDAO
         return false;
     }
 
-    public static function createRecovery(User $user, bool $force = false): ?string
+    public static function createRecovery(User $user, bool $force = false)
     {
         if($user->isVerified()) {
             try {
