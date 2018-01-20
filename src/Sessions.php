@@ -8,7 +8,7 @@ abstract class Sessions
 
     public static function isStarted(): bool
     {
-        return session_status() != PHP_SESSION_NONE;
+        return PHP_SESSION_NONE != session_status();
     }
 
     public static function start(/*...*/): void

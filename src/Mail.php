@@ -72,7 +72,7 @@ class Mail
 
     private function _build()
     {
-        if($this->header === null) {
+        if(null === $this->header) {
             $this->body = stripslashes(wordwrap($this->content, 70));
 
             // *********************SENDING(or not sending, that's the question)***

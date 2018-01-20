@@ -28,7 +28,7 @@ class Media extends Model implements \JsonSerializable
 
     private $maxSize;
 
-    public static function editable(Media $media = null, array $options = []): string
+    public static function editable(self $media = null, array $options = []): string
     {
         static $editableId = 0;
 
@@ -55,7 +55,7 @@ class Media extends Model implements \JsonSerializable
         return $str;
     }
 
-    public static function editable2(Media $media = null, array $options = []): string
+    public static function editable2(self $media = null, array $options = []): string
     {
         static $editableId = 0;
 
@@ -84,7 +84,7 @@ class Media extends Model implements \JsonSerializable
         return $str;
     }
 
-    public static function aslistItem(Media $media = null, array $options = []): string
+    public static function aslistItem(self $media = null, array $options = []): string
     {
         static $editableId = 0;
 
@@ -214,7 +214,7 @@ class Media extends Model implements \JsonSerializable
         ] + $this->_namedJsonSerialize();
     }
 
-    public static function ImgElement(?Media $media = null): string
+    public static function ImgElement(?self $media = null): string
     {
         if($media)
             return $media->asImgElement();

@@ -5,7 +5,7 @@ namespace Transitive\Utils;
 if (!function_exists('http_response_code')) {
     function http_response_code($newcode = null) {
         static $code = 200;
-        if($newcode !== null) {
+        if(null !== $newcode) {
             header('X-PHP-Response-Code: '.$newcode, true, $newcode);
             if(!headers_sent())
                 $code = $newcode;

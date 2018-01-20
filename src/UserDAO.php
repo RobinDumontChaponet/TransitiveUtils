@@ -83,7 +83,7 @@ class UserDAO extends ModelDAO
             $sortBy = null;
 
         try {
-            $statement = self::prepare('SELECT id, emailAddress, pseudonym, cTime, mTime, aTime, verified FROM '.self::getTableName().(($sortBy) ? (' ORDER BY '.$sortBy.(($orderBy == 'desc') ? ' DESC' : ' ASC')) : '').(($limit) ? ' LIMIT :limit' : '').(($offset) ? ' OFFSET :offset' : ''));
+            $statement = self::prepare('SELECT id, emailAddress, pseudonym, cTime, mTime, aTime, verified FROM '.self::getTableName().(($sortBy) ? (' ORDER BY '.$sortBy.(('desc' == $orderBy) ? ' DESC' : ' ASC')) : '').(($limit) ? ' LIMIT :limit' : '').(($offset) ? ' OFFSET :offset' : ''));
             if($limit)
                 $statement->bindParam(':limit', $limit, PDO::PARAM_INT);
             if($offset)
@@ -267,7 +267,7 @@ class UserDAO extends ModelDAO
                 throw new DAOException($e);
             }
 
-            return self::update($user) != 0;
+            return 0 != self::update($user);
         }
 
         return false;
@@ -282,7 +282,7 @@ class UserDAO extends ModelDAO
 
             $statement->execute();
 
-            if($statement->fetch(PDO::FETCH_OBJ) != null)
+            if(null != $statement->fetch(PDO::FETCH_OBJ))
                 return self::_confirm($user);
         } catch (PDOException $e) {
             throw new DAOException($e);
@@ -334,6 +334,6 @@ class UserDAO extends ModelDAO
     {
         $user->connect();
 
-        return self::update($user) != 0;
+        return 0 != self::update($user);
     }
 }

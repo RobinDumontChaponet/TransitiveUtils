@@ -95,13 +95,13 @@ abstract class Strings
     public static function startsWith(string $haystack, string $needle): string
     {
         // search backwards starting from haystack length characters from the end
-        return $needle === '' || strrpos($haystack, $needle, -strlen($haystack)) !== false;
+        return '' === $needle || false !== strrpos($haystack, $needle, -strlen($haystack));
     }
 
     public static function endsWith(string $haystack, string $needle): string
     {
         // search forward starting from end minus needle length characters
-        return $needle === '' || (($temp = strlen($haystack) - strlen($needle)) >= 0 && strpos($haystack, $needle, $temp) !== false);
+        return '' === $needle || (($temp = strlen($haystack) - strlen($needle)) >= 0 && false !== strpos($haystack, $needle, $temp));
     }
 
     public static function contentEditableParse(string $content): string
@@ -135,7 +135,7 @@ abstract class Strings
             $start = new DateTime($start);
         }
 
-        if($end === null) {
+        if(null === $end) {
             $end = new DateTime();
         }
         if(!($end instanceof DateTime)) {
@@ -146,22 +146,22 @@ abstract class Strings
         $doPlural = function ($nb, $str) {return $nb > 1 ? $str.'s' : $str; }; // adds plurals
 
         $format = array();
-        if($interval->y !== 0) {
+        if(0 !== $interval->y) {
             $format[] = '%y '.$doPlural($interval->y, 'an');
         }
-        if($interval->m !== 0) {
+        if(0 !== $interval->m) {
             $format[] = '%m mois';
         }
-        if($interval->d !== 0) {
+        if(0 !== $interval->d) {
             $format[] = '%d '.$doPlural($interval->d, 'jour');
         }
-        if($interval->h !== 0) {
+        if(0 !== $interval->h) {
             $format[] = '%h '.$doPlural($interval->h, 'heure');
         }
-        if($interval->i !== 0) {
+        if(0 !== $interval->i) {
             $format[] = '%i '.$doPlural($interval->i, 'minute');
         }
-        if($interval->s !== 0) {
+        if(0 !== $interval->s) {
             if(!count($format)) {
                 return 'Il y a moins d\'une minute';
             } else {
@@ -181,7 +181,7 @@ abstract class Strings
     public static function hex2rgb($hex) {
         $hex = str_replace('#', '', $hex);
 
-        if(strlen($hex) == 3) {
+        if(3 == strlen($hex)) {
             $r = hexdec(substr($hex, 0, 1).substr($hex, 0, 1));
             $g = hexdec(substr($hex, 1, 1).substr($hex, 1, 1));
             $b = hexdec(substr($hex, 2, 1).substr($hex, 2, 1));

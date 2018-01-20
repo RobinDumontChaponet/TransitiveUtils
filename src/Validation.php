@@ -14,7 +14,7 @@ abstract class Validation
 
         if(isset($formElements)) {
             foreach($formElements as $name => $element)
-                if(isset($values[$name]) && (gettype($element) == 'object' && get_class($element) == 'Closure') && (self::$formValidation[$name] = $element($values[$name])) !== true) {
+                if(isset($values[$name]) && ('object' == gettype($element) && 'Closure' == get_class($element)) && (self::$formValidation[$name] = $element($values[$name])) !== true) {
                     self::$formValidation[$name] = '<p class="error">'.self::$formValidation[$name].'</p>';
                     self::$formValidity = false;
                 }
@@ -43,7 +43,7 @@ abstract class Validation
 
     public static function invalidMessage(string $formElementName): ?string
     {
-        return (!empty($formElementName) && ($message = self::isValid($formElementName)) !== true) ? $message : '';
+        return (!empty($formElementName) && true !== ($message = self::isValid($formElementName))) ? $message : '';
     }
 
     public static function is_valid_phoneNumber(string $number): bool
@@ -68,7 +68,7 @@ abstract class Validation
 
     public static function format_date(string $str): bool
     {
-        if(strtotime($str) !== false)
+        if(false !== strtotime($str))
             return date('Y-m-d', strtotime($str));
 
         return false;

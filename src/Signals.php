@@ -7,7 +7,7 @@ abstract class Signals
     // http://php.net/manual/fr/function.posix-kill.php#118228
     public static function isRunning($pid) {
         $isRunning = false;
-        if(strncasecmp(PHP_OS, 'win', 3) == 0) {
+        if(0 == strncasecmp(PHP_OS, 'win', 3)) {
             $out = [];
             exec("TASKLIST /FO LIST /FI \"PID eq $pid\"", $out);
             if(count($out) > 1)

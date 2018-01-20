@@ -22,7 +22,7 @@ abstract class Images
         $x_ratio = $max_width / $width;
         $y_ratio = $max_height / $height;
 
-        if($max_width == 0 || $max_height == 0 || ($width <= $max_width && $height <= $max_height)) {
+        if(0 == $max_width || 0 == $max_height || ($width <= $max_width && $height <= $max_height)) {
             $tn_width = $width;
             $tn_height = $height;
         } elseif (($x_ratio * $height) < $max_height) {
@@ -57,7 +57,7 @@ abstract class Images
     public static function saveScaledImageRessourceToFile($src, $pathToNewImage, $max_width = 0, $max_height = 0, $type = 'jpeg', $quality = 75) {
         $tmp = self::scaleImageRessource($src, $max_width, $max_width);
 
-        if($tmp === false) {
+        if(false === $tmp) {
             $tmp = $src;
             $scalling = false;
         } else
@@ -105,7 +105,7 @@ abstract class Images
     public static function scaledImageRessource2Image($src, $max_width = 0, $max_height = 0, $type = 'jpeg', $quality = 75) {
         $tmp = self::scaleImageRessource($src, $max_width, $max_width);
 
-        if($tmp === false) {
+        if(false === $tmp) {
             $tmp = $src;
             $scalling = false;
         } else

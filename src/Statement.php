@@ -128,7 +128,7 @@ class Statement extends PDOStatement
 
             $this->orderBy = 'ORDER BY '.$column;
             if(isset($direction))
-                $this->orderBy .= (strtolower($direction) == 'desc') ? ' DESC' : ' ASC';
+                $this->orderBy .= ('desc' == strtolower($direction)) ? ' DESC' : ' ASC';
         } else
             $this->orderBy = '';
     }
