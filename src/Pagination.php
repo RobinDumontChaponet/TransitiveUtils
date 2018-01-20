@@ -104,7 +104,7 @@ class Pagination
         if($pageCount > 1) {
             $str .= '<nav class="pagination"><ul>';
 
-            $str .= '<li'.(($this->currentPage <= 1) ? ' class="inactive"' : '').'><a href="'.$this->_buildUrl($this->currentPage - 1).'">&lsaquo;</a></li>';
+            $str .= '<li'.(($this->currentPage <= 1) ? ' class="inactive"' : '').'><a href="'.$this->_buildUrl($this->currentPage - 1).'"><span>Page précédente</span></a></li>';
 
             foreach($this->_pageListGenerator() as $i) {
                 if($i > $this->currentPage && $this->currentPageItemCount < $this->itemPerPage)
@@ -123,7 +123,7 @@ class Pagination
                 $str .= '</li>';
             }
 
-            $str .= '<li'.(($this->currentPage >= $pageCount) ? ' class="inactive"' : '').'><a href="'.$this->_buildUrl($this->currentPage + 1).'">&rsaquo;</a></li>';
+            $str .= '<li'.(($this->currentPage >= $pageCount) ? ' class="inactive"' : '').'><a href="'.$this->_buildUrl($this->currentPage + 1).'"><span>Page suivante</span></a></li>';
 
             $str .= '</ul></nav>';
         }
