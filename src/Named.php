@@ -38,8 +38,8 @@ trait Named
         if(empty($name))
             $e = new ModelException('Le nom doit être renseigné.', null, $e);
 
-        if(strlen($name) > 40)
-            $e = new ModelException('Le nom doit être au maximum de 40 caractères.', null, $e);
+        if(strlen($name) > 128)
+            $e = new ModelException('Le nom doit être au maximum de 128 caractères.', null, $e);
 
         ModelException::throw($e);
 
@@ -54,8 +54,8 @@ trait Named
         if(is_numeric($title))
             $e = new ModelException('Le sous-titre ne peut pas être constitué de chiffres seulement.', null, $e);
 
-        if(strlen($title) > 25)
-            $e = new ModelException('Le sous-titre doit être de maximum 25 caractères.', null, $e);
+        if(strlen($title) > 128)
+            $e = new ModelException('Le sous-titre doit être de maximum 128 caractères.', null, $e);
 
         ModelException::throw($e);
 
