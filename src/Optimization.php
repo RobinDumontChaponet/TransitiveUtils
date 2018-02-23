@@ -62,11 +62,12 @@ class Timed
         $time = microtime(true) - $_SERVER['REQUEST_TIME_FLOAT'];
 
         echo '<dl>';
-        echo '<dt>Memory</dt><dd>'.humanWeight(memory_get_usage()).'; Peak: '.humanWeight(memory_get_peak_usage()).'</dd>';
-        echo '<dt>Process Time</dt><dd> '.($time * 1000).' ms';
+        echo '<dt>xDebug</dt>', (extension_loaded('xdebug') ? 'enabled' : 'disabled');
+        echo '<dt>Memory</dt><dd>', humanWeight(memory_get_usage()), '; Peak: ', humanWeight(memory_get_peak_usage()), '</dd>';
+        echo '<dt>Process Time</dt><dd> ', $time * 1000, ' ms';
 
-        echo '<dt>utime (compute)</dt><dd>'.self::_getrtime($ru, $this->start, 'utime').' ms</dd>';
-        echo '<dt>stime (syscall)</dt><dd>'.self::_getrtime($ru, $this->start, 'stime').' ms</dd>';
+        echo '<dt>utime (compute)</dt><dd>', self::_getrtime($ru, $this->start, 'utime'), ' ms</dd>';
+        echo '<dt>stime (syscall)</dt><dd>', self::_getrtime($ru, $this->start, 'stime'), ' ms</dd>';
         echo '</dl>';
     }
 }
