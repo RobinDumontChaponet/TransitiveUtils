@@ -110,7 +110,7 @@ class Pagination
                 if($i > $this->currentPage && $this->currentPageItemCount < $this->itemPerPage)
                     break;
 
-                if($i == 0) {
+                if(0 == $i) {
                     $str .= '<li class="spacer">…</li>';
                     continue;
                 }
