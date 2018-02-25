@@ -5,7 +5,11 @@ namespace Transitive\Utils;
 abstract class Arrays
 {
     /*
-     * http://stackoverflow.com/questions/8321620/array-unique-vs-array-flip
+	 * Keep only unique values in array
+     * explainations here : http://stackoverflow.com/questions/8321620/array-unique-vs-array-flip
+     *
+     * @param array
+     * @return array
      */
     public static function array_unique(array $array): array
     {
@@ -17,7 +21,13 @@ abstract class Arrays
         return sizeof($array) > 0 && array_keys($array) !== range(0, count($array) - 1);
     }
 
-    // does not keep keys…
+	/*
+	 * Flatten recursive arrays
+	 * does not keep keys…
+	 *
+	 * @param array multi-level array
+	 * @return array flattened array
+	 */
     public static function array_flatten(array $array): array
     {
         $flattened = array();
@@ -29,38 +39,32 @@ abstract class Arrays
         return $flattened;
     }
 
-    public function array_diff_recursive($arr1, $arr2)
+	/*
+	 * shamelessly ripped off from https://stackoverflow.com/a/29526501
+	 *
+	 * @param array
+	 * @param array
+	 * @return array difference
+	 */
+    public function array_diff_recursive(array $array1, array $array2): array
     {
-    $outputDiff = [];
+    $result = [];
 
-    foreach ($arr1 as $key => $value)
+    foreach ($array1 as $key => $value)
     {
-        //if the key exists in the second array, recursively call this function
-        //if it is an array, otherwise check if the value is in arr2
-        if (array_key_exists($key, $arr2))
-        {
-            if (is_array($value))
-            {
-                $recursiveDiff = array_diff_recursive($value, $arr2[$key]);
+        //if the key exists in the second array, recursively call this function if it is an array, otherwise check if the value is in array2
+        if (array_key_exists($key, $array2)) {
+            if (is_array($value)) {
+                $recursive = array_diff_recursive($value, $array2[$key]);
 
-                if (count($recursiveDiff))
-                {
-                    $outputDiff[$key] = $recursiveDiff;
-                }
-            }
-            elseif (!in_array($value, $arr2))
-            {
-                $outputDiff[$key] = $value;
-            }
-        }
-        //if the key is not in the second array, check if the value is in
-        //the second array (this is a quirk of how array_diff works)
-        elseif (!in_array($value, $arr2))
-        {
-            $outputDiff[$key] = $value;
-        }
+                if (count($recursive))
+                    $result[$key] = $recursive;
+            } elseif (!in_array($value, $array2))
+                $result[$key] = $value;
+        } elseif (!in_array($value, $array2)) //if the key is not in the second array, check if the value is in the second array (this is a quirk of how array_diff works)
+            $result[$key] = $value;
     }
 
-    return $outputDiff;
+    return $result;
 }
 }

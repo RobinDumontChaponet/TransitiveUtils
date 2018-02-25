@@ -2,6 +2,8 @@
 
 namespace Transitive\Utils;
 
+// functions from Transit, 2014
+
 abstract class Images
 {
     /**

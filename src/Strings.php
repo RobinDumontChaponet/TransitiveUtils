@@ -175,7 +175,7 @@ abstract class Strings
         else
             $format = array_pop($format);
 
-        return 'Il y a '.$interval->format($format);
+        return $interval->format($format);
     }
 
     public static function hex2rgb($hex) {
