@@ -5,7 +5,7 @@ namespace Transitive\Utils;
 abstract class Arrays
 {
     /*
-	 * Keep only unique values in array
+     * Keep only unique values in array
      * explainations here : http://stackoverflow.com/questions/8321620/array-unique-vs-array-flip
      *
      * @param array
@@ -21,13 +21,13 @@ abstract class Arrays
         return sizeof($array) > 0 && array_keys($array) !== range(0, count($array) - 1);
     }
 
-	/*
-	 * Flatten recursive arrays
-	 * does not keep keys…
-	 *
-	 * @param array multi-level array
-	 * @return array flattened array
-	 */
+    /*
+     * Flatten recursive arrays
+     * does not keep keys…
+     *
+     * @param array multi-level array
+     * @return array flattened array
+     */
     public static function array_flatten(array $array): array
     {
         $flattened = array();
@@ -39,13 +39,13 @@ abstract class Arrays
         return $flattened;
     }
 
-	/*
-	 * shamelessly ripped off from https://stackoverflow.com/a/29526501
-	 *
-	 * @param array
-	 * @param array
-	 * @return array difference
-	 */
+    /*
+     * shamelessly ripped off from https://stackoverflow.com/a/29526501
+     *
+     * @param array
+     * @param array
+     * @return array difference
+     */
     public function array_diff_recursive(array $array1, array $array2): array
     {
     $result = [];

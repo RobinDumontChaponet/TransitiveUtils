@@ -12,7 +12,7 @@ class Pagination
     private $maxPageDisplay = 10;
     private $span = 2;
 
-    public function __construct(int $itemCount, int $itemPerPage = 12, $currentPage = 1)
+    public function __construct(int $itemCount, int $itemPerPage = 12, ?int $currentPage = 1)
     {
         $this->itemCount = $itemCount;
         $this->itemPerPage = $itemPerPage;
@@ -43,12 +43,12 @@ class Pagination
         return ceil($this->itemCount / $this->itemPerPage);
     }
 
-    public function getCurrentPage()
+    public function getCurrentPage(): int
     {
         return $this->currentPage;
     }
 
-    public function setCurrentPage($currentPage = 1)
+    public function setCurrentPage($currentPage = 1): void
     {
         $this->currentPage = intval($currentPage);
 
@@ -56,22 +56,20 @@ class Pagination
             $this->currentPage = 1;
     }
 
-    public function setCurrentPageItemCount(int $itemCount = null)
+    public function setCurrentPageItemCount(int $itemCount = null): void
     {
         $this->currentPageItemCount = intval($itemCount);
     }
 
-    private function _buildUrl(int $page = 1): string
+    private function _buildUrl(int $pageNumber = 1, array $URLParameters = []): string
     {
-        $params = array_merge($_GET, array('p' => $page));
-        if(isset($params['request']))
-            unset($params['request']);
+        $params = array_merge($URLParameters, array('p' => $pageNumber));
         $queryString = http_build_query($params);
 
-        return SELF.'/'.@$_GET['request'].'?'.$queryString;
+        return ('/' == dirname($_SERVER['PHP_SELF']) ? '' : dirname($_SERVER['PHP_SELF'])).@$_GET['request'].'?'.$queryString;
     }
 
-    private function _pageListGenerator()
+    private function _pageListGenerator(): \Generator
     {
         $array = [];
         $pageCount = $this->getPageCount();
@@ -96,7 +94,7 @@ class Pagination
             yield $i;
     }
 
-    public function __toString()
+    public function getPageSwitcher(array $URLParameters = []): string
     {
         $str = '';
         $pageCount = $this->getPageCount();
@@ -104,7 +102,7 @@ class Pagination
         if($pageCount > 1) {
             $str .= '<nav class="pagination"><ul>';
 
-            $str .= '<li'.(($this->currentPage <= 1) ? ' class="inactive"' : '').'><a href="'.$this->_buildUrl($this->currentPage - 1).'"><span>Page précédente</span></a></li>';
+            $str .= '<li'.(($this->currentPage <= 1) ? ' class="inactive"' : '').'><a href="'.$this->_buildUrl($this->currentPage - 1, $URLParameters).'"><span>Page précédente</span></a></li>';
 
             foreach($this->_pageListGenerator() as $i) {
                 if($i > $this->currentPage && $this->currentPageItemCount < $this->itemPerPage)
@@ -119,15 +117,20 @@ class Pagination
                 if($i == $this->currentPage)
                     $str .= ' class="active"'.$i;
 
-                    $str .= '><a href="'.$this->_buildUrl($i).'">'.$i.'</a>';
+                    $str .= '><a href="'.$this->_buildUrl($i, $URLParameters).'">'.$i.'</a>';
                 $str .= '</li>';
             }
 
-            $str .= '<li'.(($this->currentPage >= $pageCount) ? ' class="inactive"' : '').'><a href="'.$this->_buildUrl($this->currentPage + 1).'"><span>Page suivante</span></a></li>';
+            $str .= '<li'.(($this->currentPage >= $pageCount) ? ' class="inactive"' : '').'><a href="'.$this->_buildUrl($this->currentPage + 1, $URLParameters).'"><span>Page suivante</span></a></li>';
 
             $str .= '</ul></nav>';
         }
 
         return $str;
+    }
+
+    public function __toString()
+    {
+        return $this->getPageSwitcher($_GET);
     }
 }

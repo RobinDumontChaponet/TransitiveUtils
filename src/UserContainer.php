@@ -29,7 +29,7 @@ trait UserContainer
         return isset($this->user);
     }
 
-    protected function _userContainerSerialize(): array
+    protected function _userContainerJsonSerialize(): array
     {
         return [
             'user' => $this->getUser(),
