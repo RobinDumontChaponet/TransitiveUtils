@@ -39,7 +39,7 @@ class User extends Model implements \JsonSerializable
     {
         parent::__construct();
         $this->_initDated();
-        $this->initGroups($groups);
+        $this->_initGroupContainer($groups);
 
         $this->emailAddress = $emailAddress;
 
