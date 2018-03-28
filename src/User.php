@@ -6,7 +6,7 @@ use DateTime;
 
 class User extends Model implements \JsonSerializable
 {
-    use Dated;
+    use Dated, GroupContainer;
 
     /**
      * @var string
@@ -29,11 +29,6 @@ class User extends Model implements \JsonSerializable
     private $sessionHash;
 
     /**
-     * @var Group[]
-     */
-    private $groups;
-
-    /**
      * @var bool
      */
     private $verified = false;
@@ -44,6 +39,7 @@ class User extends Model implements \JsonSerializable
     {
         parent::__construct();
         $this->_initDated();
+        $this->initGroups($groups);
 
         $this->emailAddress = $emailAddress;
 
@@ -52,7 +48,6 @@ class User extends Model implements \JsonSerializable
         $this->setPasswordHash($passwordHash);
 
         $this->sessionHash = '';
-        $this->groups = $groups;
     }
 
     public function getLogin(): string
@@ -111,42 +106,6 @@ class User extends Model implements \JsonSerializable
         $this->sessionHash = $sessionHash;
     }
 
-    public function setGroups(array $groups): void
-    {
-        $this->groups = $groups;
-    }
-
-    public function getGroups(): array
-    {
-        return $this->groups;
-    }
-
-    public function addGroup(Group $group): void
-    {
-        $this->groups[$group->getId()] = $group;
-    }
-
-    public function removeGroup(int $groupId): void
-    {
-        $this->removeGroupById($group->getId());
-    }
-
-    public function removeGroupById(int $groupId): void
-    {
-        if(isset($this->groups[$groupId]))
-            unset($this->groups[$groupId]);
-    }
-
-    public function hasGroup(Group $group): bool
-    {
-        return $this->hasGroupById($group->getId());
-    }
-
-    public function hasGroupById(int $groupId): bool
-    {
-        return isset($this->groups[$groupId]);
-    }
-
     public function getPseudonym(): string
     {
         return $this->pseudonym;
@@ -200,8 +159,9 @@ class User extends Model implements \JsonSerializable
         return parent::jsonSerialize()
         + [
             'pseudonyme' => htmlentities($this->getPseudonym()),
-            'groups' => $this->getGroups(),
-        ];
+        ]
+        + $this->_groupContainerSerialize()
+        ;
     }
 
     public static function createConfirmation(): string
