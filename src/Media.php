@@ -9,7 +9,15 @@ class Media extends Model implements \JsonSerializable
     public static $path = 'data/media';
 
     private static $types = ['image', 'sound', 'video'];
-    private static $sizes = ['small', 'medium', 'large'];
+    private static $sizes = [
+        0 => 'small',
+        1 => 'medium',
+        2 => 'large',
+    ];
+
+    public const small = 0;
+    public const medium = 1;
+    public const large = 2;
 
     /**
      * @var enum
@@ -26,8 +34,12 @@ class Media extends Model implements \JsonSerializable
      */
     private $extension;
 
+    /**
+     * @var int
+     */
     private $maxSize;
 
+/*
     public static function editable(self $media = null, array $options = []): string
     {
         static $editableId = 0;
@@ -54,8 +66,9 @@ class Media extends Model implements \JsonSerializable
 
         return $str;
     }
+*/
 
-    public static function editable2(self $media = null, array $options = []): string
+    public static function editable(self $media = null, array $options = []): string
     {
         static $editableId = 0;
 
@@ -65,18 +78,21 @@ class Media extends Model implements \JsonSerializable
         $name = $options['name'] ?? 'media';
         $className = $options['className'] ?? '';
         $deletable = $options['deletable'] ?? true;
+        $maxSize = $options['maxSize'] ?? self::large;
 
         $str = '<figure class="media editable'.(($className) ? ' '.$className : '').'" title="'.($media->getTitle() ?? 'Ajouter un média').'">';
 
-        if($deletable)
-            $str .= '<input type="checkbox" name="'.$name.'['.$editableId.'][delete]" id="delete_'.$name.$editableId.'" value="delete" /><label for="delete_'.$name.$editableId.'">Supprimer</label>';
-
-        $str .= '<label for="mediaInput'.$editableId.'" class="uploadButton">Téléverser</label>';
-        $str .= '<input type="file" id="mediaInput'.$editableId.'" name="mediaUpload" />';
         $str .= '<input type="hidden" name="'.$name.'['.$editableId.'][id]" readonly value="'.$media->getId().'" />';
+        if($deletable) {
+            $script = "this.parentNode.querySelector('input[name$=\'[id]\']').value = '-1'; this.parentNode.querySelector('img').style.opacity = 0;";
+            $str .= '<button type="button" id="delete_'.$name.$editableId.'" class="action remove" onclick="'.$script.'"><span>Supprimer</span></button>';
+        }
         $str .= '<input type="hidden" name="'.$name.'['.$editableId.'][name]" value="'.($media->getName() ?? '').'" />';
+
+        $str .= '<label for="mediaInput'.$editableId.'" class="action upload">Téléverser</label>';
+        $str .= '<input type="file" id="mediaInput'.$editableId.'" name="mediaUpload" />';
         if($media->id > 0)
-            $str .= '<img src="'.self::$path.'/'.$media->getMaxSize().'/'.$media->getId().'.'.$media->getExtension().'" alt="" />';
+            $str .= $media->asImgElement($maxSize);
         $str .= '<figcaption>'.($media->getName() ?? '').'</figcaption>';
         $str .= '</figure>';
         ++$editableId;
@@ -93,16 +109,17 @@ class Media extends Model implements \JsonSerializable
 
         $name = $options['name'] ?? 'media';
         $deletable = $options['deletable'] ?? true;
+        $maxSize = $options['maxSize'] ?? self::large;
 
         $str = '<li><h2>'.$media->getId().'</h2>';
 
         if($deletable)
-            $str .= '<button type="button" class="action delete" onclick="removeElement(this)">Supprimer</button>';
+            $str .= '<button type="button" class="action remove" onclick="removeElement(this)"><span>Supprimer</span></button>';
 
         $str .= '<input type="hidden" name="'.$name.'['.$editableId.'][id]" readonly value="'.$media->getId().'" />';
         $str .= '<input type="hidden" name="'.$name.'['.$editableId.'][name]" value="'.($media->getName() ?? '').'" />';
         if($media->id > 0)
-            $str .= '<img src="'.self::$path.'/'.$media->getMaxSize().'/'.$media->getId().'.'.$media->getExtension().'" alt="" />';
+            $str .= $media->asImgElement($maxSize);
         $str .= '</li>';
         ++$editableId;
 
@@ -119,7 +136,7 @@ class Media extends Model implements \JsonSerializable
         return $str.'</ul>';
     }
 
-    public function __construct($type = 'image', $mimeType = 'image/jpeg', $extension = 'jpg', $maxSize = 'small', $name = null, $title = null)
+    public function __construct($type = 'image', $mimeType = 'image/jpeg', $extension = 'jpg', int $maxSize = self::small, $name = null, $title = null)
     {
         parent::__construct();
 
@@ -146,9 +163,14 @@ class Media extends Model implements \JsonSerializable
         return $this->extension;
     }
 
-    public function getMaxSize(): string
+    public function getMaxSize(): int
     {
         return $this->maxSize;
+    }
+
+    public function getMaxSizeString(): string
+    {
+        return self::$sizes[$this->maxSize];
     }
 
     public function setType(string $type): void
@@ -168,9 +190,9 @@ class Media extends Model implements \JsonSerializable
         $this->extension = $extension;
     }
 
-    public function setMaxSize(string $maxSize): void
+    public function setMaxSize(int $maxSize): void
     {
-        if(!in_array($maxSize, self::$sizes))
+        if(!isset(self::$sizes[$maxSize]))
             throw new \Exception('Invalid size');
         $this->maxSize = $maxSize;
     }
@@ -184,11 +206,16 @@ class Media extends Model implements \JsonSerializable
         $this->name = $name;
     }
 
-    public function asImgElement(): string
+    public function asImgElement(int $maxSize = null): string
     {
+        if(isset($maxSize) && $maxSize < $this->getMaxSize())
+            $size = self::$sizes[$maxSize];
+        else
+            $size = $this->getMaxSizeString();
+
         $str = '';
         if($this->id > 0)
-            $str .= '<img src="'.self::$path.'/'.$this->getMaxSize().'/'.$this->getId().'.'.$this->getExtension().'" alt="" />';
+            $str .= '<img src="'.self::$path.'/'.$size.'/'.$this->getId().'.'.$this->getExtension().'" alt="" />';
 
         return $str;
     }
@@ -210,14 +237,15 @@ class Media extends Model implements \JsonSerializable
             'mime' => htmlentities($this->getMimeType()),
             'extension' => htmlentities($this->getExtension()),
             'maxSize' => htmlentities($this->getMaxSize()),
+            'maxSizeString' => htmlentities($this->getMaxSizeString()),
             'path' => htmlentities(self::$path),
         ] + $this->_namedJsonSerialize();
     }
 
-    public static function ImgElement(?self $media = null): string
+    public static function ImgElement(?self $media = null, int $maxSize = null): string
     {
         if($media)
-            return $media->asImgElement();
+            return $media->asImgElement($maxSize);
 
         return '';
     }
