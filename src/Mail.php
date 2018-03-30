@@ -2,6 +2,15 @@
 
 namespace Transitive\Utils;
 
+function getContentTypeString(string $contentType = 'text/plain', string $charset = 'utf-8'): string
+{
+    return 'Content-type: '.$contentType.'; charset='.$charset."\r\n".'Content-Transfer-Encoding: quoted-printable'."\r\n\r\n";
+}
+function getBoundaryString(string $boundary): string
+{
+    return "\r\n\r\n--".$boundary."\r\n";
+}
+
 class Mail
 {
     private $senderAddress;
@@ -73,24 +82,23 @@ class Mail
     private function _build()
     {
         if(null === $this->header) {
-            $this->body = stripslashes(wordwrap($this->content, 70));
-
-            // *********************SENDING(or not sending, that's the question)***
-
-            $this->header = '';
-            $this->header .= 'From: "'.$this->senderName.'" <'.$this->senderAddress.'>'."\r\n";
+            $this->header = 'From: "'.$this->senderName.'" <'.$this->senderAddress.'>'."\r\n";
             $this->header .= 'Reply-To: '.$this->senderAddress."\r\n";
+            $this->header .= 'MIME-Version: 1.0'."\r\n";
 
             if(isset($this->htmlContent)) {
                 $boundary = uniqid('np');
+                $this->header .= 'Content-Type: multipart/alternative;boundary="'.$boundary.'"'."\r\n";
 
-                $this->header .= 'MIME-Version: 1.0'."\r\n";
-                $this->header .= 'Content-Type: multipart/alternative;boundary='.$boundary."\r\n";
+                $this->body .= getBoundaryString($boundary);
+                $this->body .= getContentTypeString('text/plain');
+                $this->body .= stripslashes(wordwrap($this->content, 120));
 
-                $this->body .= "\r\n\r\n--".$boundary."\r\n";
-                $this->body .= 'Content-type: text/html; charset=utf-8'."\r\n";
+                $this->body .= getBoundaryString($boundary);
+                $this->body .= getContentTypeString('text/html');
                 $this->body .= $this->htmlContent;
-            }
+            } else
+                $this->body .= stripslashes(wordwrap($this->content, 120));
         }
     }
 
