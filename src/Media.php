@@ -264,10 +264,10 @@ class Media extends Model implements \JsonSerializable
         ] + $this->_namedJsonSerialize();
     }
 
-    public static function ImgElement(?self $media = null, int $maxSize = null): string
+    public static function ImgElement(?self $media = null, int $maxSize = null, bool $srcset = true): string
     {
         if($media)
-            return $media->asImgElement($maxSize);
+            return $media->asImgElement($maxSize, $srcset);
 
         return '';
     }
