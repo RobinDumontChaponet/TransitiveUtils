@@ -206,16 +206,38 @@ class Media extends Model implements \JsonSerializable
         $this->name = $name;
     }
 
-    public function asImgElement(int $maxSize = null): string
+    public function asImgElement(int $maxSize = null, bool $srcset = true): string
     {
+        /* static */ $minSizeString = reset(self::$sizes);
+        /* static */ $minSize = key(self::$sizes);
+
         if(isset($maxSize) && $maxSize < $this->getMaxSize())
-            $size = self::$sizes[$maxSize];
-        else
-            $size = $this->getMaxSizeString();
+            $maxSizeString = self::$sizes[$maxSize];
+        else {
+            $maxSize = $this->getMaxSize();
+            $maxSizeString = $this->getMaxSizeString();
+        }
 
         $str = '';
-        if($this->id > 0)
-            $str .= '<img src="'.self::$path.'/'.$size.'/'.$this->getId().'.'.$this->getExtension().'" alt="" />';
+        if($this->id > 0) {
+            $str .= '<img src="'.self::$path.'/'.$maxSizeString.'/'.$this->getId().'.'.$this->getExtension().'"';
+
+            if($srcset && $this->getMaxSize() > $minSize) { // maximum size we have of this media is greater than minSize, we can add srcset
+                $max = $this->getMaxSize();
+                $str .= ' srcset="';
+                reset(self::$sizes);
+                while (list($key, $sizeString) = each(self::$sizes)) {
+                    if($key > $max)
+                        break;
+                    if($size = getimagesize(self::$path.'/'.$sizeString.'/'.$this->getId().'.'.$this->getExtension()))
+                        $str .= self::$path.'/'.$sizeString.'/'.$this->getId().'.'.$this->getExtension().' '.$size[0].'w, ';
+                }
+                $str = rtrim($str, ', ');
+                $str .= '"';
+            }
+
+            $str .= ' alt="" />';
+        }
 
         return $str;
     }
