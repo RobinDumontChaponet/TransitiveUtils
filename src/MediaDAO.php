@@ -49,12 +49,25 @@ abstract class MediaDAO extends ModelDAO
         }
     }
 
-    public static function getAll(): array
+    public static function getAll(string $sortBy = null, string $orderBy = null, int $limit = null, int $offset = null): array
     {
         $objects = array();
 
+        if(!isset($sortBy) || !in_array($sortBy, ['id', 'name', 'mTime'])) {
+            $sortBy = null;
+            $orderBy = null;
+        }
+
+        if(isset($orderBy))
+            $orderBy = ('desc' == $orderBy) ? ' DESC' : ' ASC';
+
         try {
-            $statement = self::prepare('SELECT * FROM '.self::getTableName());
+            $statement = self::prepare('SELECT * FROM '.self::getTableName().(($sortBy) ? (' ORDER BY '.$sortBy.$orderBy) : '').(($limit) ? ' LIMIT :limit' : '').(($offset) ? ' OFFSET :offset' : ''));
+            if($limit)
+                $statement->bindParam(':limit', $limit, PDO::PARAM_INT);
+            if($offset)
+                $statement->bindParam(':offset', $offset, PDO::PARAM_INT);
+
             $statement->execute();
 
             while ($rs = $statement->fetch(PDO::FETCH_OBJ)) {
