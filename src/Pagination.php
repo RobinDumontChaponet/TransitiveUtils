@@ -131,6 +131,6 @@ class Pagination
 
     public function __toString()
     {
-        return $this->getPageSwitcher($_GET);
+        return $this->getPageSwitcher(/* $_GET */);
     }
 }
