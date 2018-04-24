@@ -45,6 +45,11 @@ trait GroupContainer
         return $this->hasGroupById($group->getId());
     }
 
+    public function hasGroups(): bool
+    {
+        return !empty($this->groups);
+    }
+
     public function hasGroupById(int $groupId): bool
     {
         return isset($this->groups[$groupId]);
