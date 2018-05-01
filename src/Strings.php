@@ -147,25 +147,25 @@ abstract class Strings
 
         $format = array();
         if(0 !== $interval->y) {
-            $format[] = '%y '.$doPlural($interval->y, 'an');
+            $format[] = '%y '.self::pluralize($interval->y, 'an');
         }
         if(0 !== $interval->m) {
             $format[] = '%m mois';
         }
         if(0 !== $interval->d) {
-            $format[] = '%d '.$doPlural($interval->d, 'jour');
+            $format[] = '%d '.self::pluralize($interval->d, 'jour');
         }
         if(0 !== $interval->h) {
-            $format[] = '%h '.$doPlural($interval->h, 'heure');
+            $format[] = '%h '.self::pluralize($interval->h, 'heure');
         }
         if(0 !== $interval->i) {
-            $format[] = '%i '.$doPlural($interval->i, 'minute');
+            $format[] = '%i '.self::pluralize($interval->i, 'minute');
         }
         if(0 !== $interval->s) {
             if(!count($format)) {
                 return 'Il y a moins d\'une minute';
             } else {
-                $format[] = '%s '.$doPlural($interval->s, 'seconde');
+                $format[] = '%s '.self::pluralize($interval->s, 'seconde');
             }
         }
 
