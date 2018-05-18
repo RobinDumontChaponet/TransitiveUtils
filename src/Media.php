@@ -225,8 +225,8 @@ class Media extends Model implements \JsonSerializable
             if($srcset && $this->getMaxSize() > $minSize) { // maximum size we have of this media is greater than minSize, we can add srcset
                 $max = $this->getMaxSize();
                 $str .= ' srcset="';
-                reset(self::$sizes);
-                while (list($key, $sizeString) = each(self::$sizes)) {
+
+                foreach(self::$sizes as $key => $sizeString) {
                     if($key > $max)
                         break;
                     if($size = getimagesize(self::$path.'/'.$sizeString.'/'.$this->getId().'.'.$this->getExtension()))
