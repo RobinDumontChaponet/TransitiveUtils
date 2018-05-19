@@ -101,7 +101,7 @@ class User extends Model implements \JsonSerializable
         $this->passwordHash = trim($passwordHash);
     }
 
-    private function setSessionHash(string $sessionHash): void
+    public function setSessionHash(string $sessionHash): void
     {
         $this->sessionHash = $sessionHash;
     }
