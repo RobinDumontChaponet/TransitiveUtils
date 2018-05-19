@@ -123,6 +123,7 @@ class UserDAO extends ModelDAO
                 $object->setId($id);
                 $object->setGroups(GroupDAO::getByUser($object));
                 $object->setVerified($rs->verified);
+                $object->setSessionHash($rs->sessionHash);
 
                 $object->setCreationTime(new DateTime('@'.$rs->cTime));
                 if($rs->mTime)
