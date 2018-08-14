@@ -30,6 +30,16 @@ trait Named
         return $this->title ?? '';
     }
 
+    public function hasName(): bool
+    {
+        return !empty($this->name);
+    }
+
+    public function hasTitle(): bool
+    {
+        return !empty($this->title);
+    }
+
     public function setName(string $name): void
     {
         $e = null;
