@@ -246,7 +246,8 @@ class Media extends Model implements \JsonSerializable
     {
         $str = '<figure title="'.$this->getTitle().'" class="media">';
         $str .= $this->asImgElement();
-        $str .= '<figcaption>'.$this->getName().'</figcaption>';
+        if($this->hasName())
+	        $str .= '<figcaption>'.$this->getName().'</figcaption>';
         $str .= '</figure>';
 
         return $str;
