@@ -18,6 +18,16 @@ abstract class Sessions
 
         // .... @TO-DO ?
     }
+    
+    public static function getName(): string
+    {
+	    return session_name();
+    }
+    
+    public static function setName(string $name = ''): void
+    {
+	    session_name($name);
+    }
 
     public static function getId()
     {
