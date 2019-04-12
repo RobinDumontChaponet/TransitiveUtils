@@ -1,6 +1,7 @@
 {
 	"name": "transitive/utils",
 	"description": "Description is coming",
+	"type": "library",
 	"license": "MIT",
 	"authors": [
 		{
