@@ -57,7 +57,7 @@ class Mail
         $subject = trim(htmlspecialchars(filter_var($subject, FILTER_SANITIZE_STRING)));
 
         if(empty($subject))
-            throw new ModelException('Vous avez oublié d\'indiquer votre nom !');
+            throw new ModelException('Votre message n\'a pas d\objet !');
         $this->subject = $subject;
     }
 
@@ -65,8 +65,6 @@ class Mail
     {
         $content = htmlspecialchars(filter_var($content, FILTER_UNSAFE_RAW));
 
-        if(trim(empty($content)))
-            throw new ModelException('Votre message n\'a pas d\'objet !');
         $this->content = $content;
     }
 
