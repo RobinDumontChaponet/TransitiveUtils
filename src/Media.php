@@ -229,8 +229,11 @@ class Media extends Model implements \JsonSerializable
                 foreach(self::$sizes as $key => $sizeString) {
                     if($key > $max)
                         break;
-                    if($size = getimagesize(self::$path.'/'.$sizeString.'/'.$this->getId().'.'.$this->getExtension()))
-                        $str .= self::$path.'/'.$sizeString.'/'.$this->getId().'.'.$this->getExtension().' '.$size[0].'w, ';
+
+                    $path = self::$path.'/'.$sizeString.'/'.$this->getId().'.'.$this->getExtension();
+                    if(file_exists($path))
+                        if($size = getimagesize(self::$path.'/'.$sizeString.'/'.$this->getId().'.'.$this->getExtension()))
+                            $str .= self::$path.'/'.$sizeString.'/'.$this->getId().'.'.$this->getExtension().' '.$size[0].'w, ';
                 }
                 $str = rtrim($str, ', ');
                 $str .= '"';
