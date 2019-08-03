@@ -232,7 +232,7 @@ class Media extends Model implements \JsonSerializable
 
                     $path = self::$path.'/'.$sizeString.'/'.$this->getId().'.'.$this->getExtension();
                     if(file_exists($path))
-                        if($size = getimagesize(self::$path.'/'.$sizeString.'/'.$this->getId().'.'.$this->getExtension()))
+                        if($size = @getimagesize(self::$path.'/'.$sizeString.'/'.$this->getId().'.'.$this->getExtension()))
                             $str .= self::$path.'/'.$sizeString.'/'.$this->getId().'.'.$this->getExtension().' '.$size[0].'w, ';
                 }
                 $str = rtrim($str, ', ');
@@ -250,7 +250,7 @@ class Media extends Model implements \JsonSerializable
         $str = '<figure title="'.$this->getTitle().'" class="media">';
         $str .= $this->asImgElement();
         if($this->hasName())
-	        $str .= '<figcaption>'.$this->getName().'</figcaption>';
+            $str .= '<figcaption>'.$this->getName().'</figcaption>';
         $str .= '</figure>';
 
         return $str;
