@@ -62,7 +62,7 @@ class Timed
         $time = microtime(true) - $_SERVER['REQUEST_TIME_FLOAT'];
 
         echo '<dl>';
-        echo '<dt>xDebug</dt>', (extension_loaded('xdebug') ? 'enabled' : 'disabled');
+        echo '<dt>xDebug</dt><dd>', (extension_loaded('xdebug') ? 'enabled' : 'disabled'), '</dd>';
         echo '<dt>Memory</dt><dd>', humanWeight(memory_get_usage()), '; Peak: ', humanWeight(memory_get_peak_usage()), '</dd>';
         echo '<dt>Process Time</dt><dd> ', $time * 1000, ' ms';
 
