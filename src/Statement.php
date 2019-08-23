@@ -21,6 +21,9 @@ class Statement extends PDOStatement
 
     private $combinator = 'OR';
 
+	public static $debug = false;
+    public static $dump = [];
+
     protected function __construct(PDO $pdo)
     {
         $this->pdo = $pdo;
@@ -32,6 +35,14 @@ class Statement extends PDOStatement
         if(!$this->o && (!empty($this->where) || !empty($this->limit) || !empty($this->offset)) && !empty($this->queryString))
             $this->o = $this->pdo->prepare($this->getQuery());
 
+		if(self::$debug && !$this->o) {
+			ob_start();
+			$this->debugDumpParams();
+			$dump = ob_get_contents();
+			ob_end_clean();
+
+			self::$dump[] = $dump;
+        }
 /*
         if(!$this->o) {
             file_put_contents(LOG.'queries.log', $this->getQuery().PHP_EOL, FILE_APPEND);
@@ -49,9 +60,9 @@ class Statement extends PDOStatement
             } else
                 return parent::execute();
         } elseif($this->o)
-                return $this->o->execute($inputParameters + $this->parameters);
-            else
-                return parent::execute($inputParameters + $this->parameters);
+            return $this->o->execute($inputParameters + $this->parameters);
+        else
+            return parent::execute($inputParameters + $this->parameters);
     }
 
     public function getQuery() {

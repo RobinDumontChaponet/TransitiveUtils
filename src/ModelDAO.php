@@ -9,6 +9,8 @@ abstract class ModelDAO implements CRUDInterface
     const TABLE_NAME = '';
     const DATABASE_CONNECTION_ID = 'data';
 
+    public const MYSQLDATE = 'Y-m-d H:i:s';
+
     protected static function getTableName(): string
     {
         $cc = get_called_class();

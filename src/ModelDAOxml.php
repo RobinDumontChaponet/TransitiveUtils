@@ -48,7 +48,7 @@ abstract class ModelDAOxml
     public static function create($object) {
         $dom = self::load();
 
-        if($object->getId() == -1)
+        if(-1 == $object->getId())
             $object->setId(self::docLength());
 
         $node = $dom->createElement(self::getTagName());

@@ -4,7 +4,7 @@ namespace Transitive\Utils;
 
 use DateTime;
 
-class User extends Model implements \JsonSerializable
+class UserD extends Model implements \JsonSerializable
 {
     use Dated, GroupContainer;
 
@@ -16,12 +16,7 @@ class User extends Model implements \JsonSerializable
     /**
      * @var string
      */
-    private $oauthProvider;
-
-    /**
-     * @var string
-     */
-    private $oauthUid;
+    private $pseudonym;
 
     /**
      * @var string
@@ -31,7 +26,7 @@ class User extends Model implements \JsonSerializable
     /**
      * @var string
      */
-    private $sessionHash = '';
+    private $sessionHash;
 
     /**
      * @var bool
@@ -40,7 +35,7 @@ class User extends Model implements \JsonSerializable
 
     private const HASH_COST = 12;
 
-    public function __construct(string $emailAddress, string $passwordHash = '', array $groups = array())
+    public function __construct(string $emailAddress, string $pseudonym, string $passwordHash = '', array $groups = array())
     {
         parent::__construct();
         $this->_initDated();
@@ -48,7 +43,11 @@ class User extends Model implements \JsonSerializable
 
         $this->emailAddress = $emailAddress;
 
+        $this->pseudonym = $pseudonym;
+
         $this->setPasswordHash($passwordHash);
+
+        $this->sessionHash = '';
     }
 
     public function getLogin(): string
@@ -107,26 +106,26 @@ class User extends Model implements \JsonSerializable
         $this->sessionHash = $sessionHash;
     }
 
-    public function getOauthProvider(): ?string
+    public function getPseudonym(): string
     {
-        return $this->oauthProvider;
+        return $this->pseudonym;
     }
 
-    public function setOauthProvider(string $oauthProvider = null): void
+    public function setPseudonym(string $pseudonym): void
     {
-        $this->oauthProvider = $oauthProvider;
-    }
+        $e = null;
+        $pseudonym = trim($pseudonym);
 
-    public function getOauthUid(): ?string
-    {
-        return $this->oauthUid;
-    }
+        if(is_numeric($pseudonym))
+            $e = new ModelException('Le pseudonyme ne peut pas être constitué de chiffres seulement.', null, $e);
 
-    public function setOauthUid(string $oauthUid = null): void
-    {
-        $this->oauthUid = $oauthUid;
-    }
+        if(strlen($pseudonym) > 40)
+            $e = new ModelException('Le pseudonyme ne peut contenir plus de 20 caractères.', null, $e);
 
+        ModelException::throw($e);
+
+        $this->pseudonym = $pseudonym;
+    }
 
     public function setVerified(bool $verified = true): void
     {
@@ -141,7 +140,7 @@ class User extends Model implements \JsonSerializable
     public function __toString(): string
     {
         $str = '<address class="user webspace">';
-        $str .= '	<a rel="author" href="/users/'.$this->getId().'">'.$this->getLogin().'</a>';
+        $str .= '	<a rel="author" href="/users/'.$this->getId().'">'.$this->getPseudonym().'</a>';
         $str .= '</address>';
 
         return $str;
@@ -158,11 +157,14 @@ class User extends Model implements \JsonSerializable
     public function jsonSerialize()
     {
         return parent::jsonSerialize()
+        + [
+            'pseudonyme' => htmlentities($this->getPseudonym()),
+        ]
         + $this->_groupContainerSerialize()
         ;
     }
 
-    public static function randHash(): string
+    public static function createConfirmation(): string
     {
         return md5(rand(0, 1000));
     }
