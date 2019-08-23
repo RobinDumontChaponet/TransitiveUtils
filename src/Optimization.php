@@ -33,7 +33,7 @@ abstract class Optimization
     {
         $includes = get_included_files();
 
-        echo '<details><summary>', count($includes), ' include(s)', '</summary>', PHP_EOL;
+        echo '<details><summary>includes (', count($includes), ')', '</summary>', PHP_EOL;
         echo '<ul>';
         foreach ($includes as $filename)
             echo '<li>', $filename, '</li>', PHP_EOL;
