@@ -79,6 +79,7 @@ class Media extends Model implements \JsonSerializable
         $className = $options['className'] ?? '';
         $deletable = $options['deletable'] ?? true;
         $maxSize = $options['maxSize'] ?? self::large;
+        $label = $options['label'] ?? 'Téléverser';
 
         $str = '<figure class="media editable'.(($className) ? ' '.$className : '').'" title="'.($media->getTitle() ?? 'Ajouter un média').'">';
 
@@ -89,7 +90,7 @@ class Media extends Model implements \JsonSerializable
         }
         $str .= '<input type="hidden" name="'.$name.'['.$editableId.'][name]" value="'.($media->getName() ?? '').'" />';
 
-        $str .= '<label for="mediaInput'.$editableId.'" class="action upload">Téléverser</label>';
+        $str .= '<label for="mediaInput'.$editableId.'" class="action upload">'.$label.'</label>';
         $str .= '<input type="file" id="mediaInput'.$editableId.'" name="mediaUpload" />';
         if($media->id > 0)
             $str .= $media->asImgElement($maxSize);
