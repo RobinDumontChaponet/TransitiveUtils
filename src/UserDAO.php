@@ -8,333 +8,333 @@ use Datetime;
 
 class UserDAO extends ModelDAO
 {
-    const TABLE_NAME = 'User';
+	const TABLE_NAME = 'User';
 
-    public static function create(&$user)
-    {
-        try {
-            self::beginTransaction();
+	public static function create(&$user)
+	{
+		try {
+			self::beginTransaction();
 
-            $statement = self::prepare('INSERT INTO '.self::getTableName().' (`emailAddress`, `passwordHash`, `sessionHash`, `verified`, `oauthProvider`, `oauthUid`) values (:emailAddress, :passwordHash, :sessionHash, :verified, :oauthProvider, :oauthUid)');
+			$statement = self::prepare('INSERT INTO '.self::getTableName().' (emailAddress, pseudonym, passwordHash, cTime, mTime, aTime, sessionHash, verified) values (:emailAddress, :pseudonym, :passwordHash, :cTime, :mTime, :aTime, :sessionHash, :verified)');
+			$statement->bindValue(':emailAddress', $user->getEmailAddress());
+			$statement->bindValue(':pseudonym', $user->getPseudonym());
+			$statement->bindValue(':passwordHash', $user->getPasswordHash());
 
-            $statement->bindValue(':emailAddress', $user->getEmailAddress());
-
-            $statement->bindValue(':passwordHash', $user->getPasswordHash());
-            $statement->bindValue(':sessionHash', $user->getSessionHash());
-
+			$statement->bindValue(':cTime', self::mysqlDateTime($user->getCreationTime()));
+			$statement->bindValue(':mTime', self::mysqlDateTime($user->getModificationTime()));
+			$statement->bindValue(':aTime', self::mysqlDateTime($user->getAccessTime()));
+			$statement->bindValue(':sessionHash', $user->getSessionHash());
+//             $statement->bindValue(':verificationHash', $user->getVerificationHash());
 			$statement->bindValue(':verified', (int) $user->isVerified());
 
-			$statement->bindValue(':oauthProvider', $user->getOauthProvider() );
-            $statement->bindValue(':oauthUid', $user->getOauthUid());
+			$statement->execute();
+			$user->setId(self::lastInsertId());
 
-            $statement->execute();
-            $user->setId(self::lastInsertId());
+			foreach($user->getGroups() as $group)
+				self::addInGroup($user, $group);
 
-            foreach($user->getGroups() as $group)
-                self::addInGroup($user, $group);
+			self::commit();
 
-            self::commit();
+			return $user->getId();
+		} catch (PDOException $e) {
+			self::rollBack();
+			throw new DAOException($e);
+		}
+	}
 
-            return $user->getId();
-        } catch (PDOException $e) {
-            self::rollBack();
-            throw new DAOException($e);
-        }
-    }
+	public static function update(&$user)
+	{
+		try {
+			self::beginTransaction();
 
-    public static function update(&$user)
-    {
-        try {
-            self::beginTransaction();
+			$user->setModificationTime(new DateTime());
 
-            $user->setModificationTime(new DateTime());
+			$statement = self::prepare('UPDATE '.self::getTableName().' SET emailAddress=:emailAddress, pseudonym=:pseudonym, passwordHash=:passwordHash, cTime=:cTime, mTime=:mTime, aTime=:aTime, sessionHash=:sessionHash, verified=:verified WHERE id=:id');
+			$statement->bindValue(':id', $user->getId());
+			$statement->bindValue(':emailAddress', $user->getEmailAddress());
+			$statement->bindValue(':pseudonym', $user->getPseudonym());
+			$statement->bindValue(':passwordHash', $user->getPasswordHash());
 
-            $statement = self::prepare('UPDATE '.self::getTableName().' SET `emailAddress`=:emailAddress, `passwordHash`=:passwordHash, `sessionHash`=:sessionHash, `verified`=:verified, `oauthProvider`=:oauthProvider, `oauthUid`=:oauthUid, mTime=:mTime, aTime=:aTime WHERE id=:id');
-
-            $statement->bindValue(':id', $user->getId());
-
-            $statement->bindValue(':emailAddress', $user->getEmailAddress());
-
-            $statement->bindValue(':passwordHash', $user->getPasswordHash());
-            $statement->bindValue(':sessionHash', $user->getSessionHash());
-
+			$statement->bindValue(':cTime', self::mysqlDateTime($user->getCreationTime()));
+			$statement->bindValue(':mTime', self::mysqlDateTime($user->getModificationTime()));
+			$statement->bindValue(':aTime', self::mysqlDateTime($user->getAccessTime()));
+			$statement->bindValue(':sessionHash', $user->getSessionHash());
+//             $statement->bindValue(':verificationHash', $user->getVerificationHash());
 			$statement->bindValue(':verified', (int) $user->isVerified());
 
-			$statement->bindValue(':oauthProvider', $user->getOauthProvider() );
-            $statement->bindValue(':oauthUid', $user->getOauthUid());
+			$statement->execute();
 
-            $statement->bindValue(':mTime', ($user->getModificationTime()) ? $user->getModificationTime()->format(self::MYSQLDATE) : null);
-            $statement->bindValue(':aTime', ($user->getAccessTime()) ? $user->getAccessTime()->format(self::MYSQLDATE) : null);
+			self::_updateGroups($user);
 
-            $statement->execute();
+			self::commit();
 
-            self::_updateGroups($user);
+			return $user->getId();
+		} catch (PDOException $e) {
+			self::rollBack();
+			throw new DAOException($e);
+		}
+	}
 
-            self::commit();
+	public static function getAll(string $sortBy = null, string $orderBy = null, int $limit = null, int $offset = null): array
+	{
+		$objects = array();
 
-            return $user->getId();
-        } catch (PDOException $e) {
-            self::rollBack();
-            throw new DAOException($e);
-        }
-    }
+		if(isset($sortBy) && !in_array($sortBy, ['nodeId', 'name', 'meanScore']))
+			$sortBy = null;
 
-    public static function getAll(string $sortBy = null, string $orderBy = null, int $limit = null, int $offset = null): array
-    {
-        $objects = array();
+		try {
+			$statement = self::prepare('SELECT id, emailAddress, pseudonym, cTime, mTime, aTime, verified FROM '.self::getTableName().(($sortBy) ? (' ORDER BY '.$sortBy.(('desc' == $orderBy) ? ' DESC' : ' ASC')) : '').(($limit) ? ' LIMIT :limit' : '').(($offset) ? ' OFFSET :offset' : ''));
+			if($limit)
+				$statement->bindParam(':limit', $limit, PDO::PARAM_INT);
+			if($offset)
+				$statement->bindParam(':offset', $offset, PDO::PARAM_INT);
 
-        if(isset($sortBy) && !in_array($sortBy, ['id', 'emailAddress', 'aTime']))
-            $sortBy = null;
+			$statement->execute();
 
-        try {
-            $statement = self::prepare('SELECT id, emailAddress, verified, _cTime, mTime, aTime FROM '.self::getTableName().(($sortBy) ? (' ORDER BY '.$sortBy.(('desc' == $orderBy) ? ' DESC' : ' ASC')) : '').(($limit) ? ' LIMIT :limit' : '').(($offset) ? ' OFFSET :offset' : ''));
-            if($limit)
-                $statement->bindParam(':limit', $limit, PDO::PARAM_INT);
-            if($offset)
-                $statement->bindParam(':offset', $offset, PDO::PARAM_INT);
+			while ($rs = $statement->fetch(PDO::FETCH_OBJ)) {
+				$objects[$rs->id] = new User($rs->emailAddress, $rs->pseudonym);
+				$objects[$rs->id]->setId($rs->id);
+				$objects[$rs->id]->setVerified($rs->verified);
 
-            $statement->execute();
+				$objects[$rs->id]->setCreationTime(new DateTime($rs->cTime));
+				if($rs->mTime)
+					$objects[$rs->id]->setModificationTime(new DateTime($rs->mTime));
+				if($rs->aTime)
+					$objects[$rs->id]->setAccessTime(new DateTime($rs->aTime));
+			}
+		} catch (PDOException $e) {
+			throw new DAOException($e);
+		}
 
-            while ($rs = $statement->fetch(PDO::FETCH_OBJ)) {
-                $objects[$rs->id] = new User($rs->emailAddress);
-                $objects[$rs->id]->setId($rs->id);
-                $objects[$rs->id]->setVerified($rs->verified);
+		return $objects;
+	}
 
-                $objects[$rs->id]->setCreationTime(new DateTime($rs->_cTime));
-				$objects[$rs->id]->setModificationTime(($rs->mTime)? new DateTime($rs->mTime) : null);
-                $objects[$rs->id]->setAccessTime(($rs->aTime)? new DateTime($rs->aTime) : null);
-            }
-        } catch (PDOException $e) {
-            throw new DAOException($e);
-        }
+	public static function getById(int $id): ?User
+	{
+		$object = null;
 
-        return $objects;
-    }
+		try {
+			$statement = self::prepare('SELECT emailAddress, pseudonym, passwordHash, cTime, mTime, aTime, sessionHash, verified FROM '.self::getTableName().' WHERE id=:id');
+			$statement->bindParam(':id', $id);
+			$statement->execute();
 
-    public static function getById(int $id): ?User
-    {
-        $object = null;
+			if($rs = $statement->fetch(PDO::FETCH_OBJ)) {
+				$object = new User($rs->emailAddress, $rs->pseudonym, $rs->passwordHash);
+				$object->setId($id);
+				$object->setGroups(GroupDAO::getByUser($object));
+				$object->setVerified($rs->verified);
+				$object->setSessionHash($rs->sessionHash);
 
-        try {
-            $statement = self::prepare('SELECT emailAddress, passwordHash, _cTime, mTime, aTime, sessionHash, verified FROM '.self::getTableName().' WHERE id=:id');
-            $statement->bindParam(':id', $id);
-            $statement->execute();
+				$object->setCreationTime(new DateTime($rs->cTime));
+				if($rs->mTime)
+					$object->setModificationTime(new DateTime($rs->mTime));
+				if($rs->aTime)
+					$object->setAccessTime(new DateTime($rs->aTime));
+			}
+		} catch (PDOException $e) {
+			throw new DAOException($e);
+		}
 
-            if($rs = $statement->fetch(PDO::FETCH_OBJ)) {
-                $object = new User($rs->emailAddress, $rs->passwordHash);
-                $object->setId($id);
-                $object->setGroups(GroupDAO::getByUser($object));
-                $object->setVerified($rs->verified);
-                $object->setSessionHash($rs->sessionHash);
+		return $object;
+	}
 
-                $object->setCreationTime(new DateTime($rs->_cTime));
-				$object->setModificationTime(($rs->mTime)? new DateTime($rs->mTime) : null);
-				$object->setAccessTime(($rs->aTime)? new DateTime($rs->aTime) : null);
-            }
-        } catch (PDOException $e) {
-            throw new DAOException($e);
-        }
+	public static function getByLogin(string $login): ?User
+	{
+		$object = null;
 
-        return $object;
-    }
+		try {
+			$statement = self::prepare('SELECT id, pseudonym, passwordHash, cTime, mTime, aTime, sessionHash, verified FROM '.self::getTableName().' WHERE emailAddress=:login');
+			$statement->bindParam(':login', $login);
+			$statement->execute();
 
-    public static function getByLogin(string $login): ?User
-    {
-        $object = null;
+			if($rs = $statement->fetch(PDO::FETCH_OBJ)) {
+				$object = new User($login, $rs->pseudonym, $rs->passwordHash);
+				$object->setId($rs->id);
+				$object->setGroups(GroupDAO::getByUser($object));
+				$object->setVerified($rs->verified);
 
-        try {
-            $statement = self::prepare('SELECT id, passwordHash, _cTime, mTime, aTime, sessionHash, verified FROM '.self::getTableName().' WHERE emailAddress=:login');
-            $statement->bindParam(':login', $login);
-            $statement->execute();
+				$object->setCreationTime(new DateTime($rs->cTime));
+				if($rs->mTime)
+					$object->setModificationTime(new DateTime($rs->mTime));
+				if($rs->aTime)
+					$object->setAccessTime(new DateTime($rs->aTime));
+			}
+		} catch (PDOException $e) {
+			throw new DAOException($e);
+		}
 
-            if($rs = $statement->fetch(PDO::FETCH_OBJ)) {
-                $object = new User($login, $rs->passwordHash);
-                $object->setId($rs->id);
-                $object->setGroups(GroupDAO::getByUser($object));
-                $object->setVerified($rs->verified);
+		return $object;
+	}
 
-                $object->setCreationTime(new DateTime($rs->_cTime));
-                $object->setModificationTime(($rs->mTime)? new DateTime($rs->mTime) : null);
-				$object->setAccessTime(($rs->aTime)? new DateTime($rs->aTime) : null);
-            }
-        } catch (PDOException $e) {
-            throw new DAOException($e);
-        }
+	public static function addInGroup(User $user, Group $group) {
+		try {
+			$statement = self::prepare('INSERT INTO `inGroup` (`userId`, `groupId`) VALUES (:userId, :groupId)');
+			$statement->bindValue(':userId', $user->getId());
+			$statement->bindValue(':groupId', $group->getId());
 
-        return $object;
-    }
+			$statement->execute();
+		} catch (PDOException $e) {
+			throw new DAOException($e);
+		}
+	}
 
-    public static function addInGroup(User $user, Group $group) {
-        try {
-            $statement = self::prepare('INSERT INTO `inGroup` (`userId`, `groupId`) VALUES (:userId, :groupId)');
-            $statement->bindValue(':userId', $user->getId());
-            $statement->bindValue(':groupId', $group->getId());
+	public static function removeFromGroup(User $user, Group $group) {
+		try {
+			$statement = self::prepare('DELETE FROM `inGroup` WHERE `userId`=:userId AND `groupId`=:groupId');
+			$statement->bindValue(':userId', $user->getId());
+			$statement->bindValue(':groupId', $group->getId());
 
-            $statement->execute();
-        } catch (PDOException $e) {
-            throw new DAOException($e);
-        }
-    }
+			$statement->execute();
+		} catch (PDOException $e) {
+			throw new DAOException($e);
+		}
+	}
 
-    public static function removeFromGroup(User $user, Group $group) {
-        try {
-            $statement = self::prepare('DELETE FROM `inGroup` WHERE `userId`=:userId AND `groupId`=:groupId');
-            $statement->bindValue(':userId', $user->getId());
-            $statement->bindValue(':groupId', $group->getId());
+	private static function _updateGroups(User $user)
+	{
+		$news = $user->getGroups();
+		$olds = GroupDAO::getByUser($user);
 
-            $statement->execute();
-        } catch (PDOException $e) {
-            throw new DAOException($e);
-        }
-    }
+		foreach(array_diff($olds, $news) as $removed)
+			self::removeFromGroup($user, $removed);
 
-    private static function _updateGroups(User $user)
-    {
-        $news = $user->getGroups();
-        $olds = GroupDAO::getByUser($user);
+		foreach(array_diff($news, $olds) as $added)
+			self::addInGroup($user, $added);
+	}
 
-        foreach(array_diff($olds, $news) as $removed)
-            self::removeFromGroup($user, $removed);
+	public static function search(array $on, string $combinator = 'OR', int $limit = null, int $offset = null): array
+	{
+		$objects = array();
+		$params = array();
 
-        foreach(array_diff($news, $olds) as $added)
-            self::addInGroup($user, $added);
-    }
+		try {
+			$statement = self::prepare('SELECT * FROM '.self::getTableName());
+			$statement->setLimit($limit);
+			$statement->setOffset($offset);
 
-    public static function search(array $on, string $combinator = 'OR', int $limit = null, int $offset = null): array
-    {
-        $objects = array();
-        $params = array();
+			$statement->setCombinator($combinator);
 
-        try {
-            $statement = self::prepare('SELECT * FROM '.self::getTableName());
-            $statement->setLimit($limit);
-            $statement->setOffset($offset);
+			$statement->autoBindClause(':pseudonym', @$on['pseudonym'], 'pseudonym LIKE :pseudonym', '', '%');
+			$statement->autoBindClause(':pseudonym', @$on['pseudonym-exact'], 'pseudonym LIKE :pseudonym');
 
-            $statement->setCombinator($combinator);
+			$statement->autoBindClause(':emailAddress', @$on['emailAddress'], 'emailAddress LIKE :emailAddress', '', '%');
 
-/*
-            $statement->autoBindClause(':pseudonym', @$on['pseudonym'], 'pseudonym LIKE :pseudonym', '', '%');
-            $statement->autoBindClause(':pseudonym', @$on['pseudonym-exact'], 'pseudonym LIKE :pseudonym');
-*/
+			if($limit)
+				$params[':limit'] = $limit;
+			if($offset)
+				$params[':offset'] = $offset;
 
-            $statement->autoBindClause(':emailAddress', @$on['emailAddress'], 'emailAddress LIKE :emailAddress', '', '%');
+			$statement->execute();
 
-            if($limit)
-                $params[':limit'] = $limit;
-            if($offset)
-                $params[':offset'] = $offset;
+			while ($rs = $statement->getStatement()->fetch(PDO::FETCH_OBJ)) {
+				$objects[$rs->id] = new User($rs->emailAddress, $rs->pseudonym);
+				$objects[$rs->id]->setId($rs->id);
+			}
+		} catch (PDOException $e) {
+			throw new DAOException($e);
+		}
 
-            $statement->execute();
+		return $objects;
+	}
 
-            while ($rs = $statement->getStatement()->fetch(PDO::FETCH_OBJ)) {
-                $objects[$rs->id] = new User($rs->emailAddress);
-                $objects[$rs->id]->setId($rs->id);
-            }
-        } catch (PDOException $e) {
-            throw new DAOException($e);
-        }
+	public static function createConfirmation(User $user): ?string
+	{
+		try {
+			$hash = User::createConfirmation();
 
-        return $objects;
-    }
+			$statement = self::prepare('INSERT INTO `userConfirmation` (userId, hash) values (:userId, :hash)');
+			$statement->bindValue(':userId', $user->getId());
+			$statement->bindValue(':hash', $hash);
 
-    public static function createConfirmation(User $user): ?string
-    {
-        try {
-            $hash = User::randHash();
+			$statement->execute();
 
-            $statement = self::prepare('INSERT INTO `userConfirmation` (userId, hash) values (:userId, :hash)');
-            $statement->bindValue(':userId', $user->getId());
-            $statement->bindValue(':hash', $hash);
+			return $hash;
+		} catch (PDOException $e) {
+			throw new DAOException($e);
+		}
+	}
 
-            $statement->execute();
+	private static function _confirm(User $user)
+	{
+		if(!$user->isVerified()) {
+			$user->setVerified(true);
 
-            return $hash;
-        } catch (PDOException $e) {
-            throw new DAOException($e);
-        }
-    }
+			try {
+				$statement = self::prepare('DELETE FROM `userConfirmation` WHERE userId=:userId');
+				$statement->bindValue(':userId', $user->getId());
 
-    private static function _confirm(User $user)
-    {
-        if(!$user->isVerified()) {
-            $user->setVerified(true);
+				$statement->execute();
+			} catch (PDOException $e) {
+				throw new DAOException($e);
+			}
 
-            try {
-                $statement = self::prepare('DELETE FROM `userConfirmation` WHERE userId=:userId');
-                $statement->bindValue(':userId', $user->getId());
+			return 0 != self::update($user);
+		}
 
-                $statement->execute();
-            } catch (PDOException $e) {
-                throw new DAOException($e);
-            }
+		return false;
+	}
 
-            return 0 != self::update($user);
-        }
+	public static function confirm(User $user, string $hash): bool
+	{
+		try {
+			$statement = self::prepare('SELECT userId FROM `userConfirmation` WHERE userId=:userId AND hash=:hash AND cTime > DATE_SUB(NOW(), INTERVAL 2 DAY)');
+			$statement->bindValue(':userId', $user->getId());
+			$statement->bindValue(':hash', $hash);
 
-        return false;
-    }
+			$statement->execute();
 
-    public static function confirm(User $user, string $hash): bool
-    {
-        try {
-            $statement = self::prepare('SELECT userId FROM `userConfirmation` WHERE userId=:userId AND hash=:hash AND cTime > DATE_SUB(NOW(), INTERVAL 2 DAY)');
-            $statement->bindValue(':userId', $user->getId());
-            $statement->bindValue(':hash', $hash);
+			if(null != $statement->fetch(PDO::FETCH_OBJ))
+				return self::_confirm($user);
+		} catch (PDOException $e) {
+			throw new DAOException($e);
+		}
 
-            $statement->execute();
+		return false;
+	}
 
-            if(null != $statement->fetch(PDO::FETCH_OBJ))
-                return self::_confirm($user);
-        } catch (PDOException $e) {
-            throw new DAOException($e);
-        }
+	public static function createRecovery(User $user, bool $force = false): ?string
+	{
+		if($user->isVerified()) {
+			try {
+				$hash = User::createConfirmation();
 
-        return false;
-    }
+				$statement = self::prepare((($force) ? 'REPLACE' : 'INSERT IGNORE').' INTO `userRecovery` (userId, hash) values (:userId, :hash)');
+				$statement->bindValue(':userId', $user->getId());
+				$statement->bindValue(':hash', $hash);
 
-    public static function createRecovery(User $user, bool $force = false): ?string
-    {
-        if($user->isVerified()) {
-            try {
-                $hash = User::randHash();
+				$statement->execute();
 
-                $statement = self::prepare((($force) ? 'REPLACE' : 'INSERT IGNORE').' INTO `userRecovery` (userId, hash) values (:userId, :hash)');
-                $statement->bindValue(':userId', $user->getId());
-                $statement->bindValue(':hash', $hash);
+				if($statement->rowCount())
+					return $hash;
+			} catch (PDOException $e) {
+				throw new DAOException($e);
+			}
+		}
 
-                $statement->execute();
+		return null;
+	}
 
-                if($statement->rowCount())
-                    return $hash;
-            } catch (PDOException $e) {
-                throw new DAOException($e);
-            }
-        }
+	public static function recover(User $user, string $hash): bool
+	{
+		try {
+			$statement = self::prepare('DELETE FROM `userRecovery` WHERE userId=:userId AND hash=:hash AND cTime > DATE_SUB(NOW(), INTERVAL 2 DAY)');
+			$statement->bindValue(':userId', $user->getId());
+			$statement->bindValue(':hash', $hash);
 
-        return null;
-    }
+			$statement->execute();
 
-    public static function recover(User $user, string $hash): bool
-    {
-        try {
-            $statement = self::prepare('DELETE FROM `userRecovery` WHERE userId=:userId AND hash=:hash AND cTime > DATE_SUB(NOW(), INTERVAL 2 DAY)');
-            $statement->bindValue(':userId', $user->getId());
-            $statement->bindValue(':hash', $hash);
+			return $statement->rowCount() > 0;
+		} catch (PDOException $e) {
+			throw new DAOException($e);
+		}
 
-            $statement->execute();
+		return false;
+	}
 
-            return $statement->rowCount() > 0;
-        } catch (PDOException $e) {
-            throw new DAOException($e);
-        }
+	public static function connect(User $user): bool
+	{
+		$user->connect();
 
-        return false;
-    }
-
-    public static function connect(User $user): bool
-    {
-        $user->connect();
-
-        return 0 != self::update($user);
-    }
+		return 0 != self::update($user);
+	}
 }
