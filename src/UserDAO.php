@@ -15,17 +15,17 @@ class UserDAO extends ModelDAO
 		try {
 			self::beginTransaction();
 
-			$statement = self::prepare('INSERT INTO '.self::getTableName().' (emailAddress, pseudonym, passwordHash, cTime, mTime, aTime, sessionHash, verified) values (:emailAddress, :pseudonym, :passwordHash, :cTime, :mTime, :aTime, :sessionHash, :verified)');
-			$statement->bindValue(':emailAddress', $user->getEmailAddress());
-			$statement->bindValue(':pseudonym', $user->getPseudonym());
-			$statement->bindValue(':passwordHash', $user->getPasswordHash());
+			$statement = self::prepare('INSERT INTO '.self::getTableName().' (`emailAddress`, `passwordHash`, `sessionHash`, `verified`, `oauthProvider`, `oauthUid`) values (:emailAddress, :passwordHash, :sessionHash, :verified, :oauthProvider, :oauthUid)');
 
-			$statement->bindValue(':cTime', self::mysqlDateTime($user->getCreationTime()));
-			$statement->bindValue(':mTime', self::mysqlDateTime($user->getModificationTime()));
-			$statement->bindValue(':aTime', self::mysqlDateTime($user->getAccessTime()));
+			$statement->bindValue(':emailAddress', $user->getEmailAddress());
+
+			$statement->bindValue(':passwordHash', $user->getPasswordHash());
 			$statement->bindValue(':sessionHash', $user->getSessionHash());
-//             $statement->bindValue(':verificationHash', $user->getVerificationHash());
+
 			$statement->bindValue(':verified', (int) $user->isVerified());
+
+			$statement->bindValue(':oauthProvider', $user->getOauthProvider() );
+			$statement->bindValue(':oauthUid', $user->getOauthUid());
 
 			$statement->execute();
 			$user->setId(self::lastInsertId());
@@ -49,18 +49,22 @@ class UserDAO extends ModelDAO
 
 			$user->setModificationTime(new DateTime());
 
-			$statement = self::prepare('UPDATE '.self::getTableName().' SET emailAddress=:emailAddress, pseudonym=:pseudonym, passwordHash=:passwordHash, cTime=:cTime, mTime=:mTime, aTime=:aTime, sessionHash=:sessionHash, verified=:verified WHERE id=:id');
-			$statement->bindValue(':id', $user->getId());
-			$statement->bindValue(':emailAddress', $user->getEmailAddress());
-			$statement->bindValue(':pseudonym', $user->getPseudonym());
-			$statement->bindValue(':passwordHash', $user->getPasswordHash());
+			$statement = self::prepare('UPDATE '.self::getTableName().' SET `emailAddress`=:emailAddress, `passwordHash`=:passwordHash, `sessionHash`=:sessionHash, `verified`=:verified, `oauthProvider`=:oauthProvider, `oauthUid`=:oauthUid, `mTime`=:mTime, `aTime`=:aTime WHERE id=:id');
 
-			$statement->bindValue(':cTime', self::mysqlDateTime($user->getCreationTime()));
+			$statement->bindValue(':id', $user->getId());
+
+			$statement->bindValue(':emailAddress', $user->getEmailAddress());
+
+			$statement->bindValue(':passwordHash', $user->getPasswordHash());
+			$statement->bindValue(':sessionHash', $user->getSessionHash());
+
+			$statement->bindValue(':verified', (int) $user->isVerified());
+
+			$statement->bindValue(':oauthProvider', $user->getOauthProvider() );
+			$statement->bindValue(':oauthUid', $user->getOauthUid());
+
 			$statement->bindValue(':mTime', self::mysqlDateTime($user->getModificationTime()));
 			$statement->bindValue(':aTime', self::mysqlDateTime($user->getAccessTime()));
-			$statement->bindValue(':sessionHash', $user->getSessionHash());
-//             $statement->bindValue(':verificationHash', $user->getVerificationHash());
-			$statement->bindValue(':verified', (int) $user->isVerified());
 
 			$statement->execute();
 
@@ -79,11 +83,11 @@ class UserDAO extends ModelDAO
 	{
 		$objects = array();
 
-		if(isset($sortBy) && !in_array($sortBy, ['nodeId', 'name', 'meanScore']))
+		if(isset($sortBy) && !in_array($sortBy, ['id', 'emailAddress', 'aTime']))
 			$sortBy = null;
 
 		try {
-			$statement = self::prepare('SELECT id, emailAddress, pseudonym, cTime, mTime, aTime, verified FROM '.self::getTableName().(($sortBy) ? (' ORDER BY '.$sortBy.(('desc' == $orderBy) ? ' DESC' : ' ASC')) : '').(($limit) ? ' LIMIT :limit' : '').(($offset) ? ' OFFSET :offset' : ''));
+			$statement = self::prepare('SELECT id, emailAddress, verified, _cTime, mTime, aTime FROM '.self::getTableName().(($sortBy) ? (' ORDER BY '.$sortBy.(('desc' == $orderBy) ? ' DESC' : ' ASC')) : '').(($limit) ? ' LIMIT :limit' : '').(($offset) ? ' OFFSET :offset' : ''));
 			if($limit)
 				$statement->bindParam(':limit', $limit, PDO::PARAM_INT);
 			if($offset)
@@ -92,15 +96,13 @@ class UserDAO extends ModelDAO
 			$statement->execute();
 
 			while ($rs = $statement->fetch(PDO::FETCH_OBJ)) {
-				$objects[$rs->id] = new User($rs->emailAddress, $rs->pseudonym);
+				$objects[$rs->id] = new User($rs->emailAddress);
 				$objects[$rs->id]->setId($rs->id);
 				$objects[$rs->id]->setVerified($rs->verified);
 
-				$objects[$rs->id]->setCreationTime(new DateTime($rs->cTime));
-				if($rs->mTime)
-					$objects[$rs->id]->setModificationTime(new DateTime($rs->mTime));
-				if($rs->aTime)
-					$objects[$rs->id]->setAccessTime(new DateTime($rs->aTime));
+				$objects[$rs->id]->setCreationTime(new DateTime($rs->_cTime));
+				$objects[$rs->id]->setModificationTime(($rs->mTime)? new DateTime($rs->mTime) : null);
+				$objects[$rs->id]->setAccessTime(($rs->aTime)? new DateTime($rs->aTime) : null);
 			}
 		} catch (PDOException $e) {
 			throw new DAOException($e);
@@ -114,22 +116,20 @@ class UserDAO extends ModelDAO
 		$object = null;
 
 		try {
-			$statement = self::prepare('SELECT emailAddress, pseudonym, passwordHash, cTime, mTime, aTime, sessionHash, verified FROM '.self::getTableName().' WHERE id=:id');
+			$statement = self::prepare('SELECT emailAddress, passwordHash, _cTime, mTime, aTime, sessionHash, verified FROM '.self::getTableName().' WHERE id=:id');
 			$statement->bindParam(':id', $id);
 			$statement->execute();
 
 			if($rs = $statement->fetch(PDO::FETCH_OBJ)) {
-				$object = new User($rs->emailAddress, $rs->pseudonym, $rs->passwordHash);
+				$object = new User($rs->emailAddress, $rs->passwordHash);
 				$object->setId($id);
 				$object->setGroups(GroupDAO::getByUser($object));
 				$object->setVerified($rs->verified);
 				$object->setSessionHash($rs->sessionHash);
 
-				$object->setCreationTime(new DateTime($rs->cTime));
-				if($rs->mTime)
-					$object->setModificationTime(new DateTime($rs->mTime));
-				if($rs->aTime)
-					$object->setAccessTime(new DateTime($rs->aTime));
+				$object->setCreationTime(new DateTime($rs->_cTime));
+				$object->setModificationTime(($rs->mTime)? new DateTime($rs->mTime) : null);
+				$object->setAccessTime(($rs->aTime)? new DateTime($rs->aTime) : null);
 			}
 		} catch (PDOException $e) {
 			throw new DAOException($e);
@@ -143,21 +143,19 @@ class UserDAO extends ModelDAO
 		$object = null;
 
 		try {
-			$statement = self::prepare('SELECT id, pseudonym, passwordHash, cTime, mTime, aTime, sessionHash, verified FROM '.self::getTableName().' WHERE emailAddress=:login');
+			$statement = self::prepare('SELECT id, passwordHash, _cTime, mTime, aTime, sessionHash, verified FROM '.self::getTableName().' WHERE emailAddress=:login');
 			$statement->bindParam(':login', $login);
 			$statement->execute();
 
 			if($rs = $statement->fetch(PDO::FETCH_OBJ)) {
-				$object = new User($login, $rs->pseudonym, $rs->passwordHash);
+				$object = new User($login, $rs->passwordHash);
 				$object->setId($rs->id);
 				$object->setGroups(GroupDAO::getByUser($object));
 				$object->setVerified($rs->verified);
 
-				$object->setCreationTime(new DateTime($rs->cTime));
-				if($rs->mTime)
-					$object->setModificationTime(new DateTime($rs->mTime));
-				if($rs->aTime)
-					$object->setAccessTime(new DateTime($rs->aTime));
+				$object->setCreationTime(new DateTime($rs->_cTime));
+				$object->setModificationTime(($rs->mTime)? new DateTime($rs->mTime) : null);
+				$object->setAccessTime(($rs->aTime)? new DateTime($rs->aTime) : null);
 			}
 		} catch (PDOException $e) {
 			throw new DAOException($e);
@@ -214,8 +212,10 @@ class UserDAO extends ModelDAO
 
 			$statement->setCombinator($combinator);
 
+/*
 			$statement->autoBindClause(':pseudonym', @$on['pseudonym'], 'pseudonym LIKE :pseudonym', '', '%');
 			$statement->autoBindClause(':pseudonym', @$on['pseudonym-exact'], 'pseudonym LIKE :pseudonym');
+*/
 
 			$statement->autoBindClause(':emailAddress', @$on['emailAddress'], 'emailAddress LIKE :emailAddress', '', '%');
 
@@ -227,7 +227,7 @@ class UserDAO extends ModelDAO
 			$statement->execute();
 
 			while ($rs = $statement->getStatement()->fetch(PDO::FETCH_OBJ)) {
-				$objects[$rs->id] = new User($rs->emailAddress, $rs->pseudonym);
+				$objects[$rs->id] = new User($rs->emailAddress);
 				$objects[$rs->id]->setId($rs->id);
 			}
 		} catch (PDOException $e) {
@@ -240,7 +240,7 @@ class UserDAO extends ModelDAO
 	public static function createConfirmation(User $user): ?string
 	{
 		try {
-			$hash = User::createConfirmation();
+			$hash = User::randHash();
 
 			$statement = self::prepare('INSERT INTO `userConfirmation` (userId, hash) values (:userId, :hash)');
 			$statement->bindValue(':userId', $user->getId());
@@ -296,7 +296,7 @@ class UserDAO extends ModelDAO
 	{
 		if($user->isVerified()) {
 			try {
-				$hash = User::createConfirmation();
+				$hash = User::randHash();
 
 				$statement = self::prepare((($force) ? 'REPLACE' : 'INSERT IGNORE').' INTO `userRecovery` (userId, hash) values (:userId, :hash)');
 				$statement->bindValue(':userId', $user->getId());
