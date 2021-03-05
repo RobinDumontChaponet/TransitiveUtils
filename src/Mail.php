@@ -35,7 +35,7 @@ class Mail
 
 	public function setSenderAddress(string $senderAddress)
 	{
-		$senderAddress = trim(htmlspecialchars(filter_var($senderAddress, FILTER_SANITIZE_EMAIL)));
+		$senderAddress = trim(filter_var($senderAddress, FILTER_SANITIZE_EMAIL));
 
 		if(empty($senderAddress))
 			throw new ModelException('Vous avez oublié d\'indiquer l\'adresse d\'envoi');
@@ -57,7 +57,7 @@ class Mail
 
 	public function setSenderName(string $senderName)
 	{
-		$senderName = trim(htmlspecialchars(filter_var($senderName, FILTER_SANITIZE_STRING)));
+		$senderName = trim(filter_var($senderName, FILTER_SANITIZE_STRING));
 
 		if(empty($senderName))
 			throw new ModelException('Vous avez oublié d\'indiquer votre nom !');
@@ -66,7 +66,7 @@ class Mail
 
 	public function setSubject(string $subject)
 	{
-		$subject = trim(htmlspecialchars(filter_var($subject, FILTER_SANITIZE_STRING)));
+		$subject = trim(filter_var($subject, FILTER_SANITIZE_STRING));
 
 		if(empty($subject))
 			throw new ModelException('Vous avez oublié d\'indiquer votre nom !');
@@ -75,7 +75,7 @@ class Mail
 
 	public function setContent(string $content)
 	{
-		$content = htmlspecialchars(filter_var($content, FILTER_UNSAFE_RAW));
+		$content = filter_var($content, FILTER_UNSAFE_RAW);
 
 		if(trim(empty($content)))
 			throw new ModelException('Votre message n\'a pas d\'objet !');
@@ -84,16 +84,17 @@ class Mail
 
 	public function setHtmlContent(string $htmlContent = null)
 	{
-		if(isset($htmlContent)) {
-			$htmlContent = filter_var($htmlContent, FILTER_UNSAFE_RAW);
+		$htmlContent = filter_var($htmlContent, FILTER_UNSAFE_RAW);
 
-			$this->htmlContent = $htmlContent;
-		}
+		$this->htmlContent = $htmlContent;
 	}
 
 	private function _build()
 	{
 		if(null === $this->header) {
+			if (preg_match('/[\r\n]/', $this->senderName) || preg_match('/[\r\n]/', $email))
+				throw new ModelException('Invalid data');
+
 			$this->header = 'From: "'.$this->senderName.'" <'.$this->senderAddress.'>'."\r\n";
 			if(!empty($this->replyToAddress))
 				$this->header .= 'Reply-To: '.$this->replyToAddress."\r\n";
@@ -103,7 +104,7 @@ class Mail
 			$this->header .= "Message-ID:<".time()."@".$_SERVER['SERVER_NAME'].">\r\n";// help avoid spam-filters
 			$this->header .= "X-Mailer: PHP v".phpversion()."\r\n";// help avoid spam-filters
 
-			if(isset($this->htmlContent)) {
+			if(!empty($this->htmlContent)) {
 				$boundary = uniqid('np');
 				$this->header .= 'Content-Type: multipart/alternative;boundary="'.$boundary.'"'."\r\n";
 
