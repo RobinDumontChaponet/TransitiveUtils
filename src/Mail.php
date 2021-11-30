@@ -92,7 +92,7 @@ class Mail
 	private function _build()
 	{
 		if(null === $this->header) {
-			if (preg_match('/[\r\n]/', $this->senderName) || preg_match('/[\r\n]/', $email))
+			if (preg_match('/[\r\n]/', $this->senderName) || preg_match('/[\r\n]/', $this->senderAddress))
 				throw new ModelException('Invalid data');
 
 			$this->header = 'From: "'.$this->senderName.'" <'.$this->senderAddress.'>'."\r\n";

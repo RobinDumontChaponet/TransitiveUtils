@@ -56,6 +56,7 @@ class Database
                         PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES utf8',
                         PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
                         PDO::ATTR_PERSISTENT => false,
+						PDO::MYSQL_ATTR_USE_BUFFERED_QUERY => true,
                     )
                 );
                 $pdo->setAttribute(PDO::ATTR_STATEMENT_CLASS, array('Transitive\Utils\Statement', array($pdo)));

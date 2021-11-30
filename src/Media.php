@@ -223,6 +223,28 @@ class Media extends Model implements \JsonSerializable
 		return $str;
 	}
 
+	public function asPathString(int $maxSize = null): string
+	{
+		if(isset($maxSize) && $maxSize < $this->getMaxSize())
+			$maxSizeString = self::$sizes[$maxSize];
+		else {
+			$maxSize = $this->getMaxSize();
+			$maxSizeString = $this->getMaxSizeString();
+		}
+
+		$str = '';
+		foreach(self::$sizes as $key => $sizeString) {
+			if($key > $maxSize)
+				break;
+
+			$path = self::$path.'/'.$sizeString.'/'.$this->getId().'.'.$this->getExtension();
+			if(file_exists($path))
+				$str = $path;
+		}
+
+		return $str;
+	}
+
 	public function __toString()
 	{
 		$str = '<figure title="'.$this->getTitle().'" class="media">';

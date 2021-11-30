@@ -25,7 +25,7 @@ abstract class ModelDAO implements CRUDInterface
 
 	protected static function getInstance(): ?\PDO
 	{
-		return DB::getInstanceById(self::DATABASE_CONNECTION_ID);
+		return DB::getInstanceById(self::getConnectionId());
 	}
 
 	protected static function beginTransaction(): bool

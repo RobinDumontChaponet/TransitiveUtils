@@ -4,28 +4,43 @@ namespace Transitive\Utils;
 
 class Group extends Model implements \JsonSerializable
 {
-    use Named;
+	use Named;
 
-    /**
-     * __constructor.
-     *
-     * @param string $name
-     */
-    public function __construct(string $name)
-    {
-        parent::__construct();
+	/**
+	 * @var string
+	 */
+	protected $comment;
 
-        $this->_initNamed($name);
-    }
+	/**
+	 * __constructor.
+	 *
+	 * @param string $name
+	 */
+	public function __construct(string $name, string $comment = null)
+	{
+		parent::__construct();
 
-    public function __toString(): string
-    {
-        return '<span class="group">'.$this->name.'('.$this->id.')</span>';
-    }
+		$this->_initNamed($name);
+		$this->setComment($comment);
+	}
 
-    public function jsonSerialize()
-    {
-        return parent::jsonSerialize()
-        + $this->_namedJsonSerialize();
-    }
+	public function getComment(): ?string
+	{
+		return $this->comment;
+	}
+	public function setComment(?string $comment = null): void
+	{
+		$this->comment = trim($comment);
+	}
+
+	public function __toString(): string
+	{
+		return '<span class="group">'.$this->name.'('.$this->id.')</span>';
+	}
+
+	public function jsonSerialize()
+	{
+		return parent::jsonSerialize()
+		+ $this->_namedJsonSerialize();
+	}
 }

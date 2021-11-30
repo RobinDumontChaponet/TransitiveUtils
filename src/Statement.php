@@ -66,10 +66,10 @@ class Statement extends PDOStatement
 
 	public function getQuery() {
 		return $this->queryString
-				.((!empty($this->where) && !empty($this->queryString)) ? ' WHERE'.$this->where : '')
-				.((!empty($this->orderBy) && !empty($this->queryString)) ? ' '.$this->orderBy : '')
-				.((!empty($this->limit) && !empty($this->queryString)) ? ' '.$this->limit : '')
-				.((!empty($this->offset) && !empty($this->queryString)) ? ' '.$this->offset : '');
+			.((!empty($this->where) && !empty($this->queryString)) ? ' WHERE'.$this->where : '')
+			.((!empty($this->orderBy) && !empty($this->queryString)) ? ' '.$this->orderBy : '')
+			.((!empty($this->limit) && !empty($this->queryString)) ? ' '.$this->limit : '')
+			.((!empty($this->offset) && !empty($this->queryString)) ? ' '.$this->offset : '');
 	}
 
 	public function autoBindClause(string $parameter, $value, string $sql, string $prefix = null, string $suffix = null, string $combinator = null)
