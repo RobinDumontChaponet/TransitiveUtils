@@ -2,20 +2,16 @@
 
 namespace Transitive\Utils;
 
+use Reflexive\Model\{Model, ModelAttribute, ModelProperty};
+
+#[ModelAttribute('Group')]
 class Group extends Model implements \JsonSerializable
 {
 	use Named;
 
-	/**
-	 * @var string
-	 */
-	protected $comment;
+	#[Column('comment')]
+	protected string $comment;
 
-	/**
-	 * __constructor.
-	 *
-	 * @param string $name
-	 */
 	public function __construct(string $name, string $comment = null)
 	{
 		parent::__construct();
@@ -30,7 +26,8 @@ class Group extends Model implements \JsonSerializable
 	}
 	public function setComment(?string $comment = null): void
 	{
-		$this->comment = trim($comment);
+		if(isset($comment))
+			$this->comment = trim($comment);
 	}
 
 	public function __toString(): string
@@ -38,7 +35,7 @@ class Group extends Model implements \JsonSerializable
 		return '<span class="group">'.$this->name.'('.$this->id.')</span>';
 	}
 
-	public function jsonSerialize()
+	public function jsonSerialize(): mixed
 	{
 		return parent::jsonSerialize()
 		+ $this->_namedJsonSerialize();

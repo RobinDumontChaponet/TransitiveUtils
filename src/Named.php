@@ -2,17 +2,15 @@
 
 namespace Transitive\Utils;
 
+use Reflexive\Model\{ModelAttribute, Column, ModelProperty};
+
 trait Named
 {
-    /**
-     * @var string
-     */
-    protected $name;
+    #[Column('name')]
+    protected ?string $name;
 
-    /**
-     * @var string
-     */
-    protected $title;
+    #[Column('title')]
+    protected ?string $title;
 
     protected function _initNamed(string $name, string $title = null)
     {

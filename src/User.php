@@ -155,7 +155,7 @@ class User extends Model implements \JsonSerializable
         $this->sessionHash = Sessions::getId();
     }
 
-    public function jsonSerialize()
+    public function jsonSerialize(): mixed
     {
         return parent::jsonSerialize()
         + $this->_groupContainerSerialize()

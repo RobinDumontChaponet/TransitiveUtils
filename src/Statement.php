@@ -30,7 +30,7 @@ class Statement extends PDOStatement
 		$this->o = null;
 	}
 
-	public function execute($inputParameters = null)
+	public function execute($inputParameters = null): bool
 	{
 		if(!$this->o && (!empty($this->where) || !empty($this->limit) || !empty($this->offset)) && !empty($this->queryString))
 			$this->o = $this->pdo->prepare($this->getQuery());

@@ -26,7 +26,7 @@ abstract class Model implements \JsonSerializable
         return  get_class().' [ id: '.$this->id.(((!get_parent_class())) ? ' ]' : ';  ');
     }
 
-    public function jsonSerialize()
+    public function jsonSerialize(): mixed
     {
         return [
             'id' => $this->getId(),
