@@ -7,19 +7,19 @@ namespace Transitive\Utils;
 trait GroupContainer
 {
     #[Column(arrayOf:'Transitive\Utils\Group')]
-    protected ?Collection $groups;
+    protected array $groups = [];
 
-    protected function _initGroupContainer(?Collection $groups)
+    protected function _initGroupContainer(array $groups)
     {
         $this->groups = $groups;
     }
 
-    public function setGroups(Collection $groups): void
+    public function setGroups(array $groups): void
     {
         $this->groups = $groups;
     }
 
-    public function getGroups(): Collection
+    public function getGroups(): array
     {
         return $this->groups;
     }
