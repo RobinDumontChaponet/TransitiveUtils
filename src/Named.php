@@ -2,7 +2,7 @@
 
 namespace Transitive\Utils;
 
-use Reflexive\Model\{ModelAttribute, Column, ModelProperty};
+// use Reflexive\Model\{ModelAttribute, Column, ModelProperty};
 
 trait Named
 {
