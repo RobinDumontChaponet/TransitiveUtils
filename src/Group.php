@@ -2,7 +2,7 @@
 
 namespace Transitive\Utils;
 
-use Reflexive\Model\{Model, ModelAttribute, ModelProperty};
+use Reflexive\Model\{Model, ModelAttribute, Column};
 
 #[ModelAttribute('Group')]
 class Group extends Model implements \JsonSerializable
@@ -22,7 +22,7 @@ class Group extends Model implements \JsonSerializable
 
 	public function getComment(): ?string
 	{
-		return $this->comment;
+		return $this->comment ?? null;
 	}
 	public function setComment(?string $comment = null): void
 	{
