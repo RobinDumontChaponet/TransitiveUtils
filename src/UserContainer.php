@@ -1,13 +1,13 @@
 <?php
 
 namespace Transitive\Utils;
+use Reflexive\Model\{Column, Reference, Cardinality};
 
 trait UserContainer
 {
-    /**
-     * @var User
-     */
-    protected $user;
+    #[Column('accountId')]
+	#[Reference(Cardinality::OneToMany, type: User::class, nullable: true)]
+    protected ?User $user;
 
     protected function _initUserContainer(User $user)
     {

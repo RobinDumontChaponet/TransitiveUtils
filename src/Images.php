@@ -34,7 +34,7 @@ abstract class Images
 	 * @param int   $max_width  (default: 0 keep original size)
 	 * @param int   $max_height (default: 0 keep original size)
 	 *
-	 * @return scaled image ressource or false if scaling wasn't necessary or couldn't happen
+	 * @return string scaled image ressource or false if scaling wasn't necessary or couldn't happen
 	 */
 	public static function scaleImageRessource($src, $max_width = 0, $max_height = 0) {
 		$width = imagesx($src);
@@ -121,7 +121,7 @@ abstract class Images
 	 * @param int       $max_height (default: 0 keep original size)
 	 * @param string    $type       (default: 'jpeg')
 	 *
-	 * @return scaled image or original if no scaling necessary
+	 * @return string scaled image or original if no scaling necessary
 	 */
 	public static function scaledImageRessource2Image($src, $max_width = 0, $max_height = 0, $type = 'jpeg', $quality = 75) {
 		$tmp = self::scaleImageRessource($src, $max_width, $max_width);

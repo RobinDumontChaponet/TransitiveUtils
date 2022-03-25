@@ -256,7 +256,7 @@ class Media extends Model implements \JsonSerializable
 		return $str;
 	}
 
-	public function jsonSerialize()
+	public function jsonSerialize(): mixed
 	{
 		return parent::jsonSerialize() + [
 			'type' => htmlentities($this->getType()),

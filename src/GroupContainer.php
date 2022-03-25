@@ -2,24 +2,24 @@
 
 namespace Transitive\Utils;
 
-use Reflexive\Model\{ModelAttribute, Column, ModelProperty, Collection};
+use Reflexive\Model\{Column, Collection};
 
 trait GroupContainer
 {
-    #[Column(arrayOf:'Transitive\Utils\Group')]
-    protected ?Collection $groups;
+    // #[Column(arrayOf:'Transitive\Utils\Group')]
+    protected ?Collection $groups = null;
 
     protected function _initGroupContainer(?Collection $groups)
     {
         $this->groups = $groups;
     }
 
-    public function setGroups(Collection $groups): void
+    public function setGroups(?Collection $groups): void
     {
         $this->groups = $groups;
     }
 
-    public function getGroups(): Collection
+    public function getGroups(): ?Collection
     {
         return $this->groups;
     }
@@ -29,7 +29,7 @@ trait GroupContainer
         $this->groups[$group->getId()] = $group;
     }
 
-    public function removeGroup(int $groupId): void
+    public function removeGroup(Group $group): void
     {
         $this->removeGroupById($group->getId());
     }

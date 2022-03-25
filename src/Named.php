@@ -2,7 +2,7 @@
 
 namespace Transitive\Utils;
 
-use Reflexive\Model\{ModelAttribute, Column, ModelProperty};
+use Reflexive\Model\Column;
 
 trait Named
 {
@@ -44,10 +44,10 @@ trait Named
         $name = trim($name);
 
         if(empty($name))
-            $e = new ModelException('Le nom doit être renseigné.', null, $e);
+            $e = new ModelException('Le nom doit être renseigné.', 0, $e);
 
         if(strlen($name) > 128)
-            $e = new ModelException('Le nom doit être au maximum de 128 caractères.', null, $e);
+            $e = new ModelException('Le nom doit être au maximum de 128 caractères.', 0, $e);
 
         ModelException::throw($e);
 
@@ -60,10 +60,10 @@ trait Named
         $title = trim($title);
 
         if(is_numeric($title))
-            $e = new ModelException('Le sous-titre ne peut pas être constitué de chiffres seulement.', null, $e);
+            $e = new ModelException('Le sous-titre ne peut pas être constitué de chiffres seulement.', 0, $e);
 
         if(strlen($title) > 128)
-            $e = new ModelException('Le sous-titre doit être de maximum 128 caractères.', null, $e);
+            $e = new ModelException('Le sous-titre doit être de maximum 128 caractères.', 0, $e);
 
         ModelException::throw($e);
 

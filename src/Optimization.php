@@ -70,4 +70,17 @@ class Timed
         echo '<dt>stime (syscall)</dt><dd>', self::_getrtime($ru, $this->start, 'stime'), ' ms</dd>';
         echo '</dl>';
     }
+
+	public function sendServerTiming(): bool
+	{
+		if(headers_sent())
+			return false;
+
+		$ru = getrusage();
+		$time = microtime(true) - $_SERVER['REQUEST_TIME_FLOAT'];
+
+		header('Server-Timing: time;dur='.($time*1000).';desc="Process time", utime;dur='.self::_getrtime($ru, $this->start, 'utime').';desc="compute", stime;dur='.self::_getrtime($ru, $this->start, 'stime').';desc="sysCall"');
+
+		return true;
+	}
 }

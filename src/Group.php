@@ -2,14 +2,14 @@
 
 namespace Transitive\Utils;
 
-use Reflexive\Model\{Model, ModelAttribute, Column};
+use Reflexive\Model\{Model, Table, Column};
 
-#[ModelAttribute('Group')]
+#[Table('Group')]
 class Group extends Model implements \JsonSerializable
 {
 	use Named;
 
-	#[Column('comment')]
+	#[Column]
 	protected string $comment;
 
 	public function __construct(string $name, string $comment = null)
