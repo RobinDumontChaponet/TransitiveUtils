@@ -195,7 +195,10 @@ abstract class Strings
         return $rgb; // returns an array with the rgb values
     }
 
-    public static function pluralize($value, $text) {
-        return $text.(($value > 1) ? 's' : '');
+    public static function pluralize(int $value, string $text, string $altText = null) {
+		if(!empty($altText))
+        	return (($value > 1) ? $altText : $text);
+		else
+        	return $text.(($value > 1) ? $altText : '');
     }
 }
