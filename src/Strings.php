@@ -199,6 +199,6 @@ abstract class Strings
 		if(!empty($altText))
         	return (($value > 1) ? $altText : $text);
 		else
-        	return $text.(($value > 1) ? $altText : '');
+        	return $text.(($value > 1) ? 's' : '');
     }
 }
