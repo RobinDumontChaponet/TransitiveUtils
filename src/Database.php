@@ -16,6 +16,7 @@ class Database
     private $dbPort;
     private $dbUser;
     private $dbPwd;
+    private $dbName;
     private $tablePrefix;
 
     public function __construct(string $dbName, string  $dbUser, string $dbPwd = '', string $dbType = 'mysql', string $dbHost = 'localhost', string $dbPort = '3306', string $tablePrefix = '')
