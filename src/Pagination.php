@@ -24,6 +24,10 @@ class Pagination
 	{
 		return $this->itemCount;
 	}
+	public function setItemCount(int $count): void
+	{
+		$this->itemCount = $count;
+	}
 
 	public function getItemPerPage(): int
 	{
@@ -134,6 +138,6 @@ class Pagination
 
 	public function __toString()
 	{
-		return $this->getPageSwitcher(/* $_GET */);
+		return $this->getPageSwitcher($_GET);
 	}
 }
