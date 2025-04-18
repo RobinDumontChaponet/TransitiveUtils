@@ -2,6 +2,8 @@
 
 namespace Transitive\Utils;
 
+use GdImage;
+
 class Images2
 {
 //	finfo::file();
@@ -160,18 +162,18 @@ abstract class Images
 	 *
 	 * return dominant color as color index ['red', 'green', 'blue', 'alpha']
 	 *
-	 * @param ressource $src : image ressource
+	 * @param ressource $src : image GdImage
 	 *
 	 * @return ['red', 'green', 'blue', 'alpha']
 	 */
-	public static function getDominantColor($src)
+	public static function getDominantColor(GdImage $src)
 	{
 		$width = imagesx($src);
 		$height = imagesy($src);
 		$pixel = imagecreatetruecolor(1, 1);
 		imagecopyresampled($pixel, $src, 0, 0, 0, 0, 1, 1, $width, $height);
 		$rgb = imagecolorat($pixel, 0, 0);
-		$color = imagecolorsforindex($pixel, $rgb); //you are getting the most common colors in the image
+		$color = imagecolorsforindex($pixel, $rgb); // most common colours in the image
 
 		imagedestroy($pixel);
 		return $color;
