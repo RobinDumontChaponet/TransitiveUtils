@@ -36,7 +36,10 @@ class Pagination
 
 	public function getOffset(): int
 	{
-		return $this->itemPerPage * ($this->currentPage - 1);
+		if($this->itemCount)
+			return $this->itemPerPage * ($this->currentPage - 1);
+
+		return 0;
 	}
 
 	public function getPageCount(): int
