@@ -24,7 +24,7 @@ class ModelException extends \Exception
         return $str;
     }
 
-    public static function throw(self $e = null) {
+    public static function throw(?self $e = null) {
         if(isset($e))
             throw $e;
     }
