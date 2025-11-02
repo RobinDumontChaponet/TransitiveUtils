@@ -44,8 +44,8 @@ class Pagination
 
 	public function getPageCount(): int
 	{
-		// if($this->currentPageItemCount < $this->itemPerPage)
-		// 	return $this->currentPage;
+		if($this->currentPage == 1 && $this->currentPageItemCount < $this->itemPerPage)
+			return 1;
 
 		return ceil($this->itemCount / $this->itemPerPage);
 	}
