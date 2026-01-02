@@ -104,7 +104,7 @@ abstract class Images
 			break;
 		}
 
-		imagedestroy($tmp);
+		// imagedestroy($tmp);
 
 		if(file_exists($pathToNewImage))
 			return ($scalling) ? 2 : 1;
@@ -152,7 +152,7 @@ abstract class Images
 		$buffer = ob_get_contents();
 
 		ob_end_clean();
-		imagedestroy($tmp);
+		// imagedestroy($tmp);
 
 		return $buffer;
 	}
@@ -175,7 +175,7 @@ abstract class Images
 		$rgb = imagecolorat($pixel, 0, 0);
 		$color = imagecolorsforindex($pixel, $rgb); // most common colours in the image
 
-		imagedestroy($pixel);
+		// imagedestroy($pixel);
 		return $color;
 	}
 }
