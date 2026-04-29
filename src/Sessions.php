@@ -4,77 +4,196 @@ namespace Transitive\Utils;
 
 abstract class Sessions
 {
-    public static $keyPrefix = '';
+	public static string $keyPrefix = '';
 
-    public static function isStarted(): bool
-    {
-        return PHP_SESSION_NONE != session_status();
-    }
+	private static bool $readOnly = false;
+	private static bool $loaded = false;
+	private static array $options = [];
 
-    public static function start(/*...*/): void
-    {
-    if (!self::isStarted())
-        session_start();
+	public static function isStarted(): bool
+	{
+		return session_status() === PHP_SESSION_ACTIVE;
+	}
+	public static function isEnabled(): bool
+	{
+		return session_status() !== PHP_SESSION_DISABLED;
+	}
 
-        // .... @TO-DO ?
-    }
+	public static function start(bool $readAndClose = true, array $options = []): void
+	{
+		if (self::isStarted()) {
+			return;
+		}
 
-    public static function getName(): string
-    {
-        return session_name();
-    }
+		self::$readOnly = $readAndClose;
+		self::$options = $options;
 
-    public static function setName(string $name = ''): void
-    {
-        session_name($name);
-    }
+		session_start([
+			...$options,
+			'read_and_close' => $readAndClose,
+		]);
 
-    public static function getId()
-    {
-        if (self::isStarted())
-            return session_id();
+		self::$loaded = true;
+	}
 
-        return false;
-    }
+	public static function startWritable(array $options = []): void
+	{
+		self::start(false, $options);
+		self::$readOnly = false;
+	}
 
-    public static function set(string $key, $value = null): bool
-    {
-        if(self::isStarted()) {
-            $_SESSION[self::$keyPrefix.$key] = $value;
+	public static function close(): void
+	{
+		if (self::isStarted()) {
+			session_write_close();
+		}
 
-            return true;
-        }
+		self::$readOnly = true;
+	}
 
-        return false;
-    }
+	public static function getName(): string
+	{
+		return session_name();
+	}
 
-    public static function isset(string $key): bool
-    {
-        return self::isStarted() && isset($_SESSION[self::$keyPrefix.$key]);
-    }
+	public static function setName(string $name): void
+	{
+		if (self::isStarted()) {
+			throw new \LogicException('Cannot change session name after session start.');
+		}
 
-    public static function exist(string $key): bool
-    {
-        return self::isset($key);
-    }
+		session_name($name);
+	}
 
-    public static function get(string $key)
-    {
-        if(self::isset($key))
-            return $_SESSION[self::$keyPrefix.$key];
-    }
+	public static function getId(): string|false
+	{
+		$id = session_id();
 
-    public static function delete(string $key): void
-    {
-        if(self::isset($key))
-            unset($_SESSION[self::$keyPrefix.$key]);
-    }
+		return $id !== '' ? $id : false;
+	}
 
-    public static function destroy(): void
-    {
-        if (self::isStarted()) {
-            session_unset();
-            session_destroy();
-        }
-    }
+	public static function regenerateId(bool $deleteOldSession = true): bool
+	{
+		return session_regenerate_id($deleteOldSession);
+	}
+
+	public static function set(string $key, mixed $value = null): bool
+	{
+		self::ensureWritable();
+
+		$_SESSION[self::key($key)] = $value;
+
+		return true;
+	}
+
+	public static function has(string $key): bool
+	{
+		self::ensureReadable();
+
+		return isset($_SESSION[self::key($key)]);
+	}
+
+	// legacy
+	public static function isset(string $key): bool
+	{
+		return self::has($key);
+	}
+
+	// legacy
+	public static function exist(string $key): bool
+	{
+		return self::exists($key);
+	}
+
+	public static function exists(string $key): bool
+	{
+		self::ensureReadable();
+
+		return array_key_exists(self::key($key), $_SESSION);
+	}
+
+	public static function get(string $key, mixed $default = null): mixed
+	{
+		self::ensureReadable();
+
+		return $_SESSION[self::key($key)] ?? $default;
+	}
+
+	public static function delete(string $key): void
+	{
+		self::ensureWritable();
+
+		unset($_SESSION[self::key($key)]);
+	}
+
+	public static function pull(string $key, mixed $default = null): mixed
+	{
+		self::ensureWritable();
+
+		$key = self::key($key);
+		$value = $_SESSION[$key] ?? $default;
+
+		unset($_SESSION[$key]);
+
+		return $value;
+	}
+
+	public static function destroy(): void
+	{
+		if (!self::isStarted()) {
+			session_start(self::$options);
+		}
+
+		$_SESSION = [];
+
+		if (ini_get('session.use_cookies')) {
+			$params = session_get_cookie_params();
+
+			setcookie(
+				session_name(),
+				'',
+				[
+					'expires' => time() - 42000,
+					'path' => $params['path'],
+					'domain' => $params['domain'],
+					'secure' => $params['secure'],
+					'httponly' => $params['httponly'],
+					'samesite' => $params['samesite'] ?? 'Lax',
+				]
+			);
+		}
+
+		session_destroy();
+
+		self::$readOnly = true;
+		self::$loaded = false;
+	}
+
+	private static function ensureReadable(): void
+	{
+		if (!self::$loaded) {
+			self::start(true);
+		}
+	}
+
+	private static function ensureWritable(): void
+	{
+		if (self::isStarted() && !self::$readOnly) {
+			return;
+		}
+
+		if (self::isStarted()) {
+			session_write_close();
+		}
+
+		session_start(self::$options);
+
+		self::$readOnly = false;
+		self::$loaded = true;
+	}
+
+	private static function key(string $key): string
+	{
+		return self::$keyPrefix . $key;
+	}
 }
