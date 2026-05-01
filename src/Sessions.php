@@ -74,6 +74,9 @@ abstract class Sessions
 
 	public static function regenerateId(bool $deleteOldSession = true): bool
 	{
+		if(!self::isStarted())
+			return false;
+
 		return session_regenerate_id($deleteOldSession);
 	}
 
