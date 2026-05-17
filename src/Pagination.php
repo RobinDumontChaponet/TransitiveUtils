@@ -121,7 +121,7 @@ class Pagination
 					break;
 
 				if(0 == $i) {
-					$str .= '<li class="spacer">…</li>';
+					$str .= '<li class="spacer"></li>';
 					continue;
 				}
 
