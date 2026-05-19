@@ -12,18 +12,13 @@
 		}
 	],
 	"require": {
-		"php": ">7.0"
+		"php": ">7.4"
 	},
-	"require-dev": {
-		"friendsofphp/php-cs-fixer": "^2.10"
-    },
 	"autoload": {
 		"psr-4": {
 			"Transitive\\Utils\\": "src/"
 		}
 	},
 	"scripts": {
-        "check": "./vendor/bin/php-cs-fixer fix --dry-run",
-        "fix": "./vendor/bin/php-cs-fixer fix"
     }
 }

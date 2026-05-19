@@ -3,6 +3,7 @@
 namespace Transitive\Utils;
 
 use DateTime;
+use DateTimeInterface;
 
 abstract class Strings
 {
@@ -88,20 +89,8 @@ abstract class Strings
         return $text;
     }
 
-    public static function post_slug(string $str): string {
+    public static function postSlug(string $str): string {
         return strtolower(preg_replace(array('#[\\s-]+#', '#[^A-Za-z0-9\. _]+#'), array('_', ''), self::cleanString(urldecode($str))));
-    }
-
-    public static function startsWith(string $haystack, string $needle): string
-    {
-        // search backwards starting from haystack length characters from the end
-        return '' === $needle || false !== strrpos($haystack, $needle, -strlen($haystack));
-    }
-
-    public static function endsWith(string $haystack, string $needle): string
-    {
-        // search forward starting from end minus needle length characters
-        return '' === $needle || (($temp = strlen($haystack) - strlen($needle)) >= 0 && false !== strpos($haystack, $needle, $temp));
     }
 
     public static function contentEditableParse(string $content): string
@@ -129,21 +118,20 @@ abstract class Strings
     }
 
     //http://php.net/manual/fr/dateinterval.format.php#96768
-    public static function formatDateDiff(DateTime $start, $end = null): string
+    public static function formatDateDiff(DateTimeInterface|string $start, DateTimeInterface|string|null $end = null): string
     {
-        if(!($start instanceof DateTime)) {
+        if(!($start instanceof DateTimeInterface)) {
             $start = new DateTime($start);
         }
 
         if(null === $end) {
             $end = new DateTime();
         }
-        if(!($end instanceof DateTime)) {
-            $end = new DateTime($start);
+        if(!($end instanceof DateTimeInterface)) {
+            $end = new DateTime($end);
         }
 
         $interval = $end->diff($start);
-        $doPlural = function ($nb, $str) {return $nb > 1 ? $str.'s' : $str; }; // adds plurals
 
         $format = array();
         if(0 !== $interval->y) {
@@ -161,12 +149,12 @@ abstract class Strings
         if(0 !== $interval->i) {
             $format[] = '%i '.self::pluralize($interval->i, 'minute');
         }
-        if(0 !== $interval->s) {
-            if(!count($format)) {
-                return 'Il y a moins d\'une minute';
-            } else {
-                $format[] = '%s '.self::pluralize($interval->s, 'seconde');
-            }
+        if(0 !== $interval->s && count($format)) {
+            $format[] = '%s '.self::pluralize($interval->s, 'seconde');
+        }
+
+        if(!count($format)) {
+            return 'Il y a moins d\'une minute';
         }
 
         // We use the two biggest parts

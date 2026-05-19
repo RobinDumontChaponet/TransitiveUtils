@@ -78,7 +78,7 @@ abstract class Images
 	 * @return 0 when saving fails, 1 when saving at original size or 2 when saving scaled image
 	 */
 	public static function saveScaledImageRessourceToFile($src, $pathToNewImage, $max_width = 0, $max_height = 0, $type = 'jpeg', $quality = 75) {
-		$tmp = self::scaleImageRessource($src, $max_width, $max_width);
+		$tmp = self::scaleImageRessource($src, $max_width, $max_height);
 
 		if(false === $tmp) {
 			$tmp = $src;
@@ -126,7 +126,7 @@ abstract class Images
 	 * @return string scaled image or original if no scaling necessary
 	 */
 	public static function scaledImageRessource2Image($src, $max_width = 0, $max_height = 0, $type = 'jpeg', $quality = 75) {
-		$tmp = self::scaleImageRessource($src, $max_width, $max_width);
+		$tmp = self::scaleImageRessource($src, $max_width, $max_height);
 
 		if(false === $tmp) {
 			$tmp = $src;

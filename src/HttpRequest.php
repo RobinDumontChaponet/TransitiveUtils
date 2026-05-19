@@ -2,19 +2,6 @@
 
 namespace Transitive\Utils;
 
-if (!function_exists('http_response_code')) {
-	function http_response_code($newcode = null) {
-		static $code = 200;
-		if(null !== $newcode) {
-			header('X-PHP-Response-Code: '.$newcode, true, $newcode);
-			if(!headers_sent())
-				$code = $newcode;
-		}
-
-		return $code;
-	}
-}
-
 abstract class HttpRequest
 {
 	public static function http_response_message(?int $code = null): ?string

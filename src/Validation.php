@@ -2,6 +2,8 @@
 
 namespace Transitive\Utils;
 
+use DateTimeImmutable;
+
 abstract class Validation
 {
     private static $formValidation;
@@ -53,12 +55,12 @@ abstract class Validation
 
     public static function is_valid_email(string $str): bool
     {
-        return (!preg_match('/^([a-z0-9\+_\-]+)(\.[a-z0-9\+_\-]+)*@([a-z0-9\-]+\.)+[a-z]{2,6}$/ix', $str)) ? false : true;
+        return filter_var($str, FILTER_VALIDATE_EMAIL) !== false;
     }
 
     public static function contains_numeric(string $str): bool
     {
-        return preg_match('/[0-9]+/', $str);
+        return preg_match('/[0-9]+/', $str) === 1;
     }
 
     public static function contains(string $needles, string $str): bool
@@ -66,30 +68,43 @@ abstract class Validation
         return strlen($str) != strcspn($str, $needles);
     }
 
-    public static function format_date(string $str): bool
+    public static function format_date(string $str): string|false
     {
-        if(false !== strtotime($str))
-            return date('Y-m-d', strtotime($str));
+        $timestamp = strtotime($str);
+        if(false !== $timestamp)
+            return date('Y-m-d', $timestamp);
 
         return false;
     }
 
     public static function is_within($number, $low, $high): bool
     {
+        $number = filter_var($number, FILTER_VALIDATE_FLOAT);
+        $low = filter_var($low, FILTER_VALIDATE_FLOAT);
+        $high = filter_var($high, FILTER_VALIDATE_FLOAT);
+
+        if($number === false || $low === false || $high === false)
+            return false;
+
         return $number > $low && $number <= $high;
     }
 
     public static function is_port_number($number): bool
     {
-        return self::is_within($number, 0, 65535);
+        return filter_var(
+            $number,
+            FILTER_VALIDATE_INT,
+            ['options' => ['min_range' => 1, 'max_range' => 65535]]
+        ) !== false;
     }
 
     public static function is_valid_SQL_date(string $date): bool
     {
-        if (preg_match('/^(\d{4})-(\d{2})-(\d{2})$/', $date, $matches))
-            if (checkdate($matches[2], $matches[3], $matches[1]))
-                return true;
+        $parsed = DateTimeImmutable::createFromFormat('!Y-m-d', $date);
+        $errors = DateTimeImmutable::getLastErrors();
 
-        return false;
+        return $parsed !== false
+            && $parsed->format('Y-m-d') === $date
+            && (!$errors || ($errors['warning_count'] === 0 && $errors['error_count'] === 0));
     }
 }
